@@ -18,7 +18,9 @@
     @font-face {
       font-family: "Gotham Black Wordmark";
       src:
-        url("fonts/Gotham-Black.otf") format("opentype"),
+        url("media/Gotham-Black.otf") format("opentype"),
+        /* GHL / CDN fallback (same file in dealer-ultimate media/) */
+        url("https://cdn.jsdelivr.net/gh/AFROAgencyAI/dealer-ultimate@main/media/Gotham-Black.otf") format("opentype"),
         local("Gotham-Black"),
         local("Gotham Black"),
         local("Gotham Black Regular");
@@ -56,6 +58,9 @@
 
     html {
       scroll-behavior: smooth;
+      width: 100%;
+      max-width: 100%;
+      overflow-x: clip;
     }
 
     @media (prefers-reduced-motion: reduce) {
@@ -70,6 +75,35 @@
       background: #e7e5e4;
       -webkit-font-smoothing: antialiased;
       line-height: 1.5;
+      width: 100%;
+      max-width: 100%;
+      overflow-x: clip;
+    }
+
+    /*
+      GHL paste: custom HTML is often nested in a padded/max-width parent.
+      On mobile, break body out to true viewport width so cards fill the screen
+      (design gutters stay via --page-inset on sections). Desktop is fine as-is.
+    */
+    @media (max-width: 899px) {
+      body.du-ghl {
+        width: 100vw !important;
+        max-width: 100vw !important;
+        position: relative;
+        left: 50%;
+        right: 50%;
+        margin-left: -50vw !important;
+        margin-right: -50vw !important;
+        padding-left: 0 !important;
+        padding-right: 0 !important;
+        box-sizing: border-box;
+      }
+
+      body.du-ghl .variant {
+        width: auto;
+        max-width: none;
+        box-sizing: border-box;
+      }
     }
 
     /* Hash-scroll stop: sticky bar sits slightly over the section tile (depth) */

@@ -1,16 +1,13 @@
 <!DOCTYPE html>
 <!--
-  Dealer Ultimate — GHL paste version (CDN-wired)
-  ------------------------------------
-  1. Upload everything in ./media/ to GHL Media Library (or host on your CDN).
-  2. If media URLs are absolute CDN links, set DU_MEDIA_BASE below to that folder
-     URL (with trailing slash), e.g.
-       window.DU_MEDIA_BASE = "https://storage.googleapis.com/msgsndr/XXXX/media/";
-     Leave "" to use relative media/ paths (works when HTML and media/ ship together).
-  3. In GHL: blank/custom page → Custom Code / HTML element → paste this full file
-     (or paste <head> CSS+JS into site header and body into a full-width code block).
-  4. Wire the #leadForm submit to a GHL form / webhook when you go live.
-  Built from demo.html. Rebuild: python3 du-deliverables/build-ghl-paste.py
+  Dealer Ultimate — GHL paste (CDN-wired)
+  --------------------------------------
+  Repo: https://github.com/AFROAgencyAI/dealer-ultimate
+  Media: https://cdn.jsdelivr.net/gh/AFROAgencyAI/dealer-ultimate@main/media/
+
+  Paste this full file into a GHL blank/custom HTML page.
+  Gotham wordmark loads from the same CDN. Lead form is demo-only until wired.
+  Rebuild: python3 du-deliverables/build-ghl-paste.py then push media to GitHub.
 -->
 <html lang="en">
 
@@ -23,7 +20,25 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
   <style>
-    /* Gotham omitted for GHL paste — display falls back to Inter */
+    /*
+      Gotham Black is a separate face (PostScript: Gotham-Black). On the system
+      it often registers as family "Gotham Black" with weight Regular — NOT 900.
+      Asking for weight 900 makes the browser skip it and fall back to Inter.
+    */
+    @font-face {
+      font-family: "Gotham Black Wordmark";
+      src:
+        url("https://cdn.jsdelivr.net/gh/AFROAgencyAI/dealer-ultimate@main/media/Gotham-Black.otf") format("opentype"),
+        /* GHL / CDN fallback (same file in dealer-ultimate media/) */
+        url("https://cdn.jsdelivr.net/gh/AFROAgencyAI/dealer-ultimate@main/media/Gotham-Black.otf") format("opentype"),
+        local("Gotham-Black"),
+        local("Gotham Black"),
+        local("Gotham Black Regular");
+      font-weight: 400;
+      font-style: normal;
+      font-display: swap;
+    }
+
     :root {
       --ink: #1c1917;
       --muted: #3f3f46;
@@ -36,7 +51,7 @@
       /* Photo matches buttons / select / header chrome */
       --hero-r: 8px;
       --font: "Inter", system-ui, sans-serif;
-      --display: "Inter", system-ui, sans-serif;
+      --display: "Gotham", "Inter", system-ui, sans-serif;
       --page-inset: 16px;
       /* Shared gutter: page edge → tile, and tile edge → floating header */
       --inner: clamp(16px, 3.5vw, 40px);
@@ -53,6 +68,9 @@
 
     html {
       scroll-behavior: smooth;
+      width: 100%;
+      max-width: 100%;
+      overflow-x: clip;
     }
 
     @media (prefers-reduced-motion: reduce) {
@@ -67,6 +85,35 @@
       background: #e7e5e4;
       -webkit-font-smoothing: antialiased;
       line-height: 1.5;
+      width: 100%;
+      max-width: 100%;
+      overflow-x: clip;
+    }
+
+    /*
+      GHL paste: custom HTML is often nested in a padded/max-width parent.
+      On mobile, break body out to true viewport width so cards fill the screen
+      (design gutters stay via --page-inset on sections). Desktop is fine as-is.
+    */
+    @media (max-width: 899px) {
+      body.du-ghl {
+        width: 100vw !important;
+        max-width: 100vw !important;
+        position: relative;
+        left: 50%;
+        right: 50%;
+        margin-left: -50vw !important;
+        margin-right: -50vw !important;
+        padding-left: 0 !important;
+        padding-right: 0 !important;
+        box-sizing: border-box;
+      }
+
+      body.du-ghl .variant {
+        width: auto;
+        max-width: none;
+        box-sizing: border-box;
+      }
     }
 
     /* Hash-scroll stop: sticky bar sits slightly over the section tile (depth) */
@@ -2235,12 +2282,11 @@
 <body class="du-ghl">
 
   <script>
-    /* Set after GHL media upload if paths are not relative */
+    /* Default media base = public GitHub CDN */
     window.DU_MEDIA_BASE = window.DU_MEDIA_BASE || "https://cdn.jsdelivr.net/gh/AFROAgencyAI/dealer-ultimate@main/media/";
     window.duMediaUrl = function (path) {
       if (!path) return path;
       path = String(path);
-      /* Already absolute (CDN-wired) — never re-prefix */
       if (/^https?:\/\//i.test(path) || path.indexOf("//") === 0) return path;
       var base = window.DU_MEDIA_BASE || "";
       if (!base) return path;
