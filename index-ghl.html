@@ -30,6 +30,7 @@
       src:
         url("https://cdn.jsdelivr.net/gh/AFROAgencyAI/dealer-ultimate@main/media/Gotham-Black.otf") format("opentype"),
         /* GHL / CDN fallback (same file in dealer-ultimate media/) */
+        url("https://cdn.jsdelivr.net/gh/AFROAgencyAI/dealer-ultimate@main/media/Gotham-Black.otf") format("opentype"),
         local("Gotham-Black"),
         local("Gotham Black"),
         local("Gotham Black Regular");
@@ -90,12 +91,52 @@
     }
 
     /*
-      GHL paste: custom HTML is often nested in a padded/max-width parent.
-      On mobile, break body out to true viewport width so cards fill the screen
-      (design gutters stay via --page-inset on sections). Desktop is fine as-is.
+      GHL paste: Custom HTML is nested in Section/Row/Column with padding.
+      GHL also often strips <body class="du-ghl">
+
+  <script>
+    /* Default media base = public GitHub CDN */
+    window.DU_MEDIA_BASE = window.DU_MEDIA_BASE || "https://cdn.jsdelivr.net/gh/AFROAgencyAI/dealer-ultimate@main/media/";
+    window.duMediaUrl = function (path) {
+      if (!path) return path;
+      path = String(path);
+      if (/^https?:\/\//i.test(path) || path.indexOf("//") === 0) return path;
+      var base = window.DU_MEDIA_BASE || "";
+      if (!base) return path;
+      if (base.slice(-1) !== "/") base += "/";
+      return base + path.replace(/^media\//, "");
+    };
+    (function () {
+      if (!window.DU_MEDIA_BASE) return;
+      document.querySelectorAll("img[src]").forEach(function (img) {
+        var s = img.getAttribute("src");
+        if (!s || /^https?:\/\//i.test(s)) return;
+        if (s.indexOf("media/") !== 0) return;
+        img.src = window.duMediaUrl(s);
+      });
+      var icon = document.querySelector('link[rel="icon"][href]');
+      if (icon) {
+        var h = icon.getAttribute("href");
+        if (h && h.indexOf("media/") === 0) icon.href = window.duMediaUrl(h);
+      }
+    })();
+  </script>
+, so breakout must live on .du-ghl-root
+      (a wrapper that survives paste), not only on body.du-ghl.
     */
+    .du-ghl-root {
+      width: 100%;
+      max-width: 100%;
+      box-sizing: border-box;
+      background: #e7e5e4;
+      overflow-x: clip;
+    }
+
     @media (max-width: 899px) {
-      body.du-ghl {
+      .du-ghl-root {
+        /* Kill design outer gutters on mobile when embedded (GHL already full-bleed) */
+        --page-inset: 0px;
+        --inner: 16px;
         width: 100vw !important;
         max-width: 100vw !important;
         position: relative;
@@ -108,10 +149,36 @@
         box-sizing: border-box;
       }
 
-      body.du-ghl .variant {
+      body.du-ghl {
+        width: 100vw !important;
+        max-width: 100vw !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        overflow-x: clip;
+      }
+
+      .du-ghl-root .variant {
         width: auto;
         max-width: none;
+        margin-left: 0;
+        margin-right: 0;
         box-sizing: border-box;
+      }
+
+      /* Floating header: still inset slightly from screen edge for chrome depth */
+      .du-ghl-root .fake-head {
+        --page-inset: 10px;
+        top: 10px;
+        margin-top: 10px;
+        margin-left: 10px;
+        margin-right: 10px;
+        margin-bottom: calc(-1 * (10px + 10px + var(--head-h)));
+      }
+
+      .du-ghl-root .hero-a {
+        --page-inset: 0px;
+        border-radius: 0;
+        padding-top: calc(10px + var(--head-h) + 12px);
       }
     }
 
@@ -2278,36 +2345,8 @@
   </style>
 </head>
 
-<body class="du-ghl">
-
-  <script>
-    /* Default media base = public GitHub CDN */
-    window.DU_MEDIA_BASE = window.DU_MEDIA_BASE || "https://cdn.jsdelivr.net/gh/AFROAgencyAI/dealer-ultimate@main/media/";
-    window.duMediaUrl = function (path) {
-      if (!path) return path;
-      path = String(path);
-      if (/^https?:\/\//i.test(path) || path.indexOf("//") === 0) return path;
-      var base = window.DU_MEDIA_BASE || "";
-      if (!base) return path;
-      if (base.slice(-1) !== "/") base += "/";
-      return base + path.replace(/^media\//, "");
-    };
-    (function () {
-      if (!window.DU_MEDIA_BASE) return;
-      document.querySelectorAll("img[src]").forEach(function (img) {
-        var s = img.getAttribute("src");
-        if (!s || /^https?:\/\//i.test(s)) return;
-        if (s.indexOf("media/") !== 0) return;
-        img.src = window.duMediaUrl(s);
-      });
-      var icon = document.querySelector('link[rel="icon"][href]');
-      if (icon) {
-        var h = icon.getAttribute("href");
-        if (h && h.indexOf("media/") === 0) icon.href = window.duMediaUrl(h);
-      }
-    })();
-  </script>
-
+<body>
+  <div class="du-ghl-root">
   <header class="fake-head" id="siteHeader">
     <div class="logo">
       <img src="https://cdn.jsdelivr.net/gh/AFROAgencyAI/dealer-ultimate@main/media/du-logo-mark.png" alt="" width="34" height="34" />
@@ -2829,8 +2868,31 @@
       </div>
     </div>
   </footer>
+  </div><!-- /.du-ghl-root -->
 
   <script>
+    /* Zero padding on GHL Section/Row/Column ancestors (survives when body is stripped) */
+    (function stripGhlChrome() {
+      var root = document.querySelector(".du-ghl-root");
+      if (!root) return;
+      var el = root.parentElement;
+      var hops = 0;
+      while (el && hops < 12 && el !== document.documentElement) {
+        try {
+          el.style.setProperty("padding-left", "0", "important");
+          el.style.setProperty("padding-right", "0", "important");
+          el.style.setProperty("margin-left", "0", "important");
+          el.style.setProperty("margin-right", "0", "important");
+          el.style.setProperty("max-width", "none", "important");
+          el.style.setProperty("width", "100%", "important");
+          el.style.setProperty("box-sizing", "border-box", "important");
+        } catch (e) {}
+        if (el.tagName === "BODY" || el.tagName === "MAIN") break;
+        el = el.parentElement;
+        hops++;
+      }
+    })();
+
     (function () {
       var trigger = document.getElementById("selectTrigger");
       var menu = document.getElementById("selectMenu");
