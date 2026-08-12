@@ -223,11 +223,17 @@
       padding: 0;
     }
 
+    /*
+      Page stone. Must win over GHL shell (.bg-fixed is white by default) or
+      the top gutter reads as a pure white stripe instead of #e7e5e4.
+    */
     html {
       scroll-behavior: smooth;
       width: 100%;
       max-width: 100%;
       overflow-x: clip;
+      background: #e7e5e4 !important;
+      background-color: #e7e5e4 !important;
     }
 
     @media (prefers-reduced-motion: reduce) {
@@ -236,15 +242,29 @@
       }
     }
 
-    body {
+    body,
+    body.du-ghl {
       font-family: var(--font);
       color: var(--ink);
-      background: #e7e5e4;
+      background: #e7e5e4 !important;
+      background-color: #e7e5e4 !important;
       -webkit-font-smoothing: antialiased;
       line-height: 1.5;
       width: 100%;
       max-width: 100%;
       overflow-x: clip;
+      margin: 0;
+    }
+
+    /* GHL funnel/page chrome paints a fixed white layer behind the page */
+    .bg-fixed,
+    html body .hl_wrapper,
+    html body .hl_wrapper--inner,
+    .hl_page-preview--content,
+    .hl_page-preview--content .section-VqSOCGUYT,
+    [class*="section-"] {
+      background-color: #e7e5e4 !important;
+      background: #e7e5e4 !important;
     }
 
     /*
@@ -258,8 +278,13 @@
       width: 100%;
       max-width: 100%;
       box-sizing: border-box;
-      background: #e7e5e4;
+      background: #e7e5e4 !important;
+      background-color: #e7e5e4 !important;
       overflow-x: clip;
+      /* flow-root blocks header margin-collapse past root (white GHL shell leak) */
+      display: flow-root;
+      min-height: 100vh;
+      min-height: 100dvh;
     }
 
     /*
@@ -3104,8 +3129,22 @@
     /* Zero padding on GHL Section/Row/Column ancestors (survives when body is stripped) */
     (function stripGhlChrome() {
       /* Only when pasted as GHL page (body.du-ghl). Never strip host gutters
-         on portfolio embeds like afroagency.ai or local file previews. */
+         on local file previews without that class. */
       if (!document.body || !document.body.classList.contains("du-ghl")) return;
+
+      var stone = "#e7e5e4";
+      try {
+        document.documentElement.style.setProperty("background", stone, "important");
+        document.documentElement.style.setProperty("background-color", stone, "important");
+        document.body.style.setProperty("background", stone, "important");
+        document.body.style.setProperty("background-color", stone, "important");
+        document.body.style.setProperty("margin", "0", "important");
+        document.querySelectorAll(".bg-fixed").forEach(function (el) {
+          el.style.setProperty("background", stone, "important");
+          el.style.setProperty("background-color", stone, "important");
+        });
+      } catch (e) {}
+
       var root = document.querySelector(".du-ghl-root");
       if (!root) return;
       var el = root.parentElement;
@@ -3114,11 +3153,15 @@
         try {
           el.style.setProperty("padding-left", "0", "important");
           el.style.setProperty("padding-right", "0", "important");
+          el.style.setProperty("padding-top", "0", "important");
           el.style.setProperty("margin-left", "0", "important");
           el.style.setProperty("margin-right", "0", "important");
+          el.style.setProperty("margin-top", "0", "important");
           el.style.setProperty("max-width", "none", "important");
           el.style.setProperty("width", "100%", "important");
           el.style.setProperty("box-sizing", "border-box", "important");
+          el.style.setProperty("background", stone, "important");
+          el.style.setProperty("background-color", stone, "important");
         } catch (e) {}
         if (el.tagName === "BODY" || el.tagName === "MAIN") break;
         el = el.parentElement;
