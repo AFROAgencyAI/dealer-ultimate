@@ -4,9 +4,13 @@
   --------------------------------------
   Repo: https://github.com/AFROAgencyAI/dealer-ultimate
   Media: https://cdn.jsdelivr.net/gh/AFROAgencyAI/dealer-ultimate@main/media/
+  Canonical site: https://dealerultimate.com/
 
-  Paste this full file into a GHL blank/custom HTML page.
-  Gotham wordmark loads from the same CDN. Lead form is demo-only until wired.
+  Paste this full file into a GHL blank/custom HTML page (not a nested section
+  only), so the page title, meta tags, and JSON-LD stay in the document head.
+  Before go-live: set SITE in build-ghl-paste.py (or replace https://dealerultimate.com in the HTML)
+  to the real HTTPS domain, match GHL page SEO fields, and re-paste.
+
   Rebuild: python3 du-deliverables/build-ghl-paste.py then push media to GitHub.
 -->
 <html lang="en">
@@ -15,8 +19,41 @@
   <script>document.documentElement.classList.add('js');</script>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Dealer Ultimate</title>
+  <!--
+    SEO: set DU_SITE_URL in GHL page settings / replace before go-live.
+    Canonical + Open Graph must match the public HTTPS URL of this page.
+  -->
+  <title>RV Dealership Marketing for Independents | Dealer Ultimate</title>
+  <meta name="description"
+    content="Help independent RV dealers stock the lot and put buyers on the driveway. Buyback, aged inventory, service and trade-ins. Get a demo of Dealer Ultimate." />
+  <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" />
+  <meta name="author" content="Dealer Ultimate" />
+  <meta name="theme-color" content="#C2410C" />
+  <meta name="format-detection" content="telephone=no" />
+  <link rel="canonical" href="https://dealerultimate.com/" />
   <link rel="icon" href="https://cdn.jsdelivr.net/gh/AFROAgencyAI/dealer-ultimate@main/media/favicon.svg" type="image/svg+xml" />
+  <link rel="apple-touch-icon" href="https://cdn.jsdelivr.net/gh/AFROAgencyAI/dealer-ultimate@main/media/du-logo-mark-102.png" />
+
+  <!-- Open Graph -->
+  <meta property="og:type" content="website" />
+  <meta property="og:site_name" content="Dealer Ultimate" />
+  <meta property="og:locale" content="en_US" />
+  <meta property="og:url" content="https://dealerultimate.com/" />
+  <meta property="og:title" content="RV Dealership Marketing for Independents | Dealer Ultimate" />
+  <meta property="og:description"
+    content="Inventory and buyers for independent RV lots. Buyback, move units sitting too long, and put shoppers on the driveway." />
+  <meta property="og:image" content="https://cdn.jsdelivr.net/gh/AFROAgencyAI/dealer-ultimate@main/media/du-og-share.jpg" />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
+  <meta property="og:image:alt" content="RV dealership lot: handshake between dealer and buyer" />
+
+  <!-- Twitter / X -->
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="RV Dealership Marketing for Independents | Dealer Ultimate" />
+  <meta name="twitter:description"
+    content="Inventory and buyers for independent RV lots. Buyback, aged units, service and trade-ins." />
+  <meta name="twitter:image" content="https://cdn.jsdelivr.net/gh/AFROAgencyAI/dealer-ultimate@main/media/du-og-share.jpg" />
+
   <!-- LCP: hero photo (top half). Browser picks width from imagesrcset. -->
   <link rel="preload" as="image" type="image/webp" fetchpriority="high"
     href="https://cdn.jsdelivr.net/gh/AFROAgencyAI/dealer-ultimate@main/media/du-hero-1-w960.webp"
@@ -34,6 +71,73 @@
     <link rel="stylesheet"
       href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" />
   </noscript>
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "Organization",
+        "@id": "https://dealerultimate.com/#organization",
+        "name": "Dealer Ultimate",
+        "url": "https://dealerultimate.com/",
+        "logo": {
+          "@type": "ImageObject",
+          "url": "https://cdn.jsdelivr.net/gh/AFROAgencyAI/dealer-ultimate@main/media/du-logo-mark-102.png"
+        },
+        "description": "Dealership growth partner for independent RV dealers: inventory acquisition, buyer demand, and service and trade-in reactivation.",
+        "areaServed": "US",
+        "knowsAbout": [
+          "RV dealership marketing",
+          "RV inventory acquisition",
+          "Dealership lead generation",
+          "Service and trade-in marketing"
+        ]
+      },
+      {
+        "@type": "WebSite",
+        "@id": "https://dealerultimate.com/#website",
+        "url": "https://dealerultimate.com/",
+        "name": "Dealer Ultimate",
+        "publisher": { "@id": "https://dealerultimate.com/#organization" },
+        "inLanguage": "en-US"
+      },
+      {
+        "@type": "WebPage",
+        "@id": "https://dealerultimate.com/#webpage",
+        "url": "https://dealerultimate.com/",
+        "name": "RV Dealership Marketing for Independents | Dealer Ultimate",
+        "description": "Help independent RV dealers stock the lot and put buyers on the driveway. Buyback, aged inventory, service and trade-ins.",
+        "isPartOf": { "@id": "https://dealerultimate.com/#website" },
+        "about": { "@id": "https://dealerultimate.com/#organization" },
+        "primaryImageOfPage": {
+          "@type": "ImageObject",
+          "url": "https://cdn.jsdelivr.net/gh/AFROAgencyAI/dealer-ultimate@main/media/du-og-share.jpg"
+        },
+        "inLanguage": "en-US"
+      },
+      {
+        "@type": "ProfessionalService",
+        "@id": "https://dealerultimate.com/#service",
+        "name": "Dealer Ultimate",
+        "url": "https://dealerultimate.com/",
+        "image": "https://cdn.jsdelivr.net/gh/AFROAgencyAI/dealer-ultimate@main/media/du-og-share.jpg",
+        "description": "Marketing and inventory services that put units and buyers on independent RV lots.",
+        "provider": { "@id": "https://dealerultimate.com/#organization" },
+        "serviceType": [
+          "RV dealership marketing",
+          "Used RV buyback",
+          "Inventory marketing",
+          "Service and trade-in reactivation"
+        ],
+        "areaServed": {
+          "@type": "Country",
+          "name": "United States"
+        }
+      }
+    ]
+  }
+  </script>
   <style>
     /*
       Gotham Black is a separate face (PostScript: Gotham-Black). On the system
@@ -365,6 +469,8 @@
       min-width: 0;
       /* Left cluster — leaves right side clear for hamburger + demo */
       margin-right: auto;
+      text-decoration: none;
+      color: inherit;
     }
 
     .fake-head .logo img {
@@ -816,6 +922,17 @@
     .stats-section {
       margin: 0 var(--page-inset) clamp(1.5rem, 3vw, 2.25rem);
       padding: 0 var(--inner);
+    }
+
+    .stats-section h2 {
+      font-family: var(--display);
+      font-weight: 700;
+      font-size: clamp(1.55rem, 2.8vw, 2.1rem);
+      letter-spacing: -0.03em;
+      line-height: 1.2;
+      color: var(--ink);
+      max-width: 20em;
+      margin: 0 0 clamp(1rem, 2vw, 1.35rem);
     }
 
     .stats-grid {
@@ -2418,16 +2535,16 @@
     })();
   </script>
 
-  <div class="du-ghl-root">
+  <div class="du-ghl-root" id="top">
   <header class="fake-head" id="siteHeader">
-    <div class="logo">
+    <a class="logo" href="#top" aria-label="Dealer Ultimate home">
       <img src="https://cdn.jsdelivr.net/gh/AFROAgencyAI/dealer-ultimate@main/media/du-logo-mark-68.png" srcset="https://cdn.jsdelivr.net/gh/AFROAgencyAI/dealer-ultimate@main/media/du-logo-mark-68.png 68w, https://cdn.jsdelivr.net/gh/AFROAgencyAI/dealer-ultimate@main/media/du-logo-mark-102.png 102w"
-        sizes="34px" alt="" width="34" height="34" decoding="async" fetchpriority="high" />
+        sizes="34px" alt="Dealer Ultimate" width="34" height="34" decoding="async" fetchpriority="high" />
       <span class="logo-wordmark" role="img" aria-label="Dealer Ultimate">
         <span aria-hidden="true">DEALER</span>
         <span aria-hidden="true">ULTIMATE</span>
       </span>
-    </div>
+    </a>
     <nav class="links" aria-label="Primary">
       <a href="#how">How it works</a>
       <a href="#solutions">Solutions</a>
@@ -2454,9 +2571,9 @@
     <section class="hero-a" aria-label="Hero">
       <div class="hero-stage">
         <div class="hero-text">
-          <h1 data-reveal-hero>We help independent RV dealers find the units and the buyers</h1>
+          <h1 data-reveal-hero>RV dealership marketing that finds the units and the buyers</h1>
           <p class="sub" data-reveal-hero>
-            We put inventory and buyers on your lot so you can sell more. <span class="deal-accent">Deal?</span>
+            We put inventory and buyers on independent RV lots so you can sell more. <span class="deal-accent">Deal?</span>
           </p>
           <div class="hero-actions" data-reveal-hero>
             <a class="btn-primary" href="#demo">Get a Demo</a>
@@ -2554,7 +2671,8 @@
   </section>
 
   <!-- Fullpath-style stats + mini viz, DealerNerds case-study numbers -->
-  <section class="stats-section" id="results" aria-label="Results" data-reveal-group>
+  <section class="stats-section" id="results" aria-labelledby="stats-heading" data-reveal-group>
+    <h2 id="stats-heading" data-reveal>What dealers see on the board</h2>
     <div class="stats-grid">
       <article class="stat-card" data-reveal>
         <div class="stat-viz" aria-hidden="true"><svg viewBox="0 0 360 220" preserveAspectRatio="xMidYMax slice"
@@ -2668,27 +2786,27 @@
   </section>
 
   <section class="how-section" id="how" aria-labelledby="how-heading" data-reveal-group>
-    <h2 id="how-heading" data-reveal>How it works</h2>
+    <h2 id="how-heading" data-reveal>How it works for independent RV lots</h2>
     <div class="how-tx" id="howTx">
       <!-- Shared image outside accordion — mobile above list, desktop left -->
       <div class="how-tx-media" aria-hidden="true" data-reveal>
         <div class="how-tx-shot is-active" data-how="buyers">
           <picture>
             <source type="image/webp" srcset="https://cdn.jsdelivr.net/gh/AFROAgencyAI/dealer-ultimate@main/media/du-more-buyers-1-w640.webp 640w, https://cdn.jsdelivr.net/gh/AFROAgencyAI/dealer-ultimate@main/media/du-more-buyers-1-w960.webp 960w, https://cdn.jsdelivr.net/gh/AFROAgencyAI/dealer-ultimate@main/media/du-more-buyers-1-w1280.webp 1280w" sizes="(min-width: 900px) 42vw, 100vw" />
-            <img src="https://cdn.jsdelivr.net/gh/AFROAgencyAI/dealer-ultimate@main/media/du-more-buyers-1-w960.jpg" srcset="https://cdn.jsdelivr.net/gh/AFROAgencyAI/dealer-ultimate@main/media/du-more-buyers-1-w640.jpg 640w, https://cdn.jsdelivr.net/gh/AFROAgencyAI/dealer-ultimate@main/media/du-more-buyers-1-w960.jpg 960w, https://cdn.jsdelivr.net/gh/AFROAgencyAI/dealer-ultimate@main/media/du-more-buyers-1-w1280.jpg 1280w" sizes="(min-width: 900px) 42vw, 100vw" alt="" width="960" height="720" decoding="async" loading="lazy" />
+            <img src="https://cdn.jsdelivr.net/gh/AFROAgencyAI/dealer-ultimate@main/media/du-more-buyers-1-w960.jpg" srcset="https://cdn.jsdelivr.net/gh/AFROAgencyAI/dealer-ultimate@main/media/du-more-buyers-1-w640.jpg 640w, https://cdn.jsdelivr.net/gh/AFROAgencyAI/dealer-ultimate@main/media/du-more-buyers-1-w960.jpg 960w, https://cdn.jsdelivr.net/gh/AFROAgencyAI/dealer-ultimate@main/media/du-more-buyers-1-w1280.jpg 1280w" sizes="(min-width: 900px) 42vw, 100vw" alt="Shoppers on an independent RV dealership lot" width="960" height="720" decoding="async" loading="lazy" />
           </picture>
         </div>
         <div class="how-tx-shot" data-how="inventory">
           <picture>
             <source type="image/webp" srcset="https://cdn.jsdelivr.net/gh/AFROAgencyAI/dealer-ultimate@main/media/du-more-inventory-1-w640.webp 640w, https://cdn.jsdelivr.net/gh/AFROAgencyAI/dealer-ultimate@main/media/du-more-inventory-1-w960.webp 960w, https://cdn.jsdelivr.net/gh/AFROAgencyAI/dealer-ultimate@main/media/du-more-inventory-1-w1280.webp 1280w" sizes="(min-width: 900px) 42vw, 100vw" />
-            <img src="https://cdn.jsdelivr.net/gh/AFROAgencyAI/dealer-ultimate@main/media/du-more-inventory-1-w960.jpg" srcset="https://cdn.jsdelivr.net/gh/AFROAgencyAI/dealer-ultimate@main/media/du-more-inventory-1-w640.jpg 640w, https://cdn.jsdelivr.net/gh/AFROAgencyAI/dealer-ultimate@main/media/du-more-inventory-1-w960.jpg 960w, https://cdn.jsdelivr.net/gh/AFROAgencyAI/dealer-ultimate@main/media/du-more-inventory-1-w1280.jpg 1280w" sizes="(min-width: 900px) 42vw, 100vw" alt="" width="960" height="720" decoding="async" loading="lazy" />
+            <img src="https://cdn.jsdelivr.net/gh/AFROAgencyAI/dealer-ultimate@main/media/du-more-inventory-1-w960.jpg" srcset="https://cdn.jsdelivr.net/gh/AFROAgencyAI/dealer-ultimate@main/media/du-more-inventory-1-w640.jpg 640w, https://cdn.jsdelivr.net/gh/AFROAgencyAI/dealer-ultimate@main/media/du-more-inventory-1-w960.jpg 960w, https://cdn.jsdelivr.net/gh/AFROAgencyAI/dealer-ultimate@main/media/du-more-inventory-1-w1280.jpg 1280w" sizes="(min-width: 900px) 42vw, 100vw" alt="Used RVs and campers staged on a dealer lot" width="960" height="720" decoding="async" loading="lazy" />
           </picture>
         </div>
         <div class="how-tx-shot" data-how="sales">
           <!-- Reuse hero crop until more-sales master lands -->
           <picture>
             <source type="image/webp" srcset="https://cdn.jsdelivr.net/gh/AFROAgencyAI/dealer-ultimate@main/media/du-hero-1-w640.webp 640w, https://cdn.jsdelivr.net/gh/AFROAgencyAI/dealer-ultimate@main/media/du-hero-1-w960.webp 960w, https://cdn.jsdelivr.net/gh/AFROAgencyAI/dealer-ultimate@main/media/du-hero-1-w1280.webp 1280w" sizes="(min-width: 900px) 42vw, 100vw" />
-            <img src="https://cdn.jsdelivr.net/gh/AFROAgencyAI/dealer-ultimate@main/media/du-hero-1-w960.jpg" srcset="https://cdn.jsdelivr.net/gh/AFROAgencyAI/dealer-ultimate@main/media/du-hero-1-w640.jpg 640w, https://cdn.jsdelivr.net/gh/AFROAgencyAI/dealer-ultimate@main/media/du-hero-1-w960.jpg 960w, https://cdn.jsdelivr.net/gh/AFROAgencyAI/dealer-ultimate@main/media/du-hero-1-w1280.jpg 1280w" sizes="(min-width: 900px) 42vw, 100vw" alt="" width="960" height="720" decoding="async" loading="lazy" />
+            <img src="https://cdn.jsdelivr.net/gh/AFROAgencyAI/dealer-ultimate@main/media/du-hero-1-w960.jpg" srcset="https://cdn.jsdelivr.net/gh/AFROAgencyAI/dealer-ultimate@main/media/du-hero-1-w640.jpg 640w, https://cdn.jsdelivr.net/gh/AFROAgencyAI/dealer-ultimate@main/media/du-hero-1-w960.jpg 960w, https://cdn.jsdelivr.net/gh/AFROAgencyAI/dealer-ultimate@main/media/du-hero-1-w1280.jpg 1280w" sizes="(min-width: 900px) 42vw, 100vw" alt="Dealer and buyer closing a sale on the RV lot" width="960" height="720" decoding="async" loading="lazy" />
           </picture>
         </div>
       </div>
@@ -2745,13 +2863,13 @@
 
   <!-- Solutions — three flagship services, copy locked in du-research/09-SOLUTIONS.md -->
   <section class="sol-section" id="solutions" aria-labelledby="sol-heading" data-reveal-group>
-    <h2 id="sol-heading" data-reveal>Where do you want to start?</h2>
+    <h2 id="sol-heading" data-reveal>Where independent RV dealers start</h2>
     <div class="sol-grid">
       <article class="sol-card" data-reveal>
         <div class="sol-media" aria-hidden="true">
           <picture>
             <source type="image/webp" srcset="https://cdn.jsdelivr.net/gh/AFROAgencyAI/dealer-ultimate@main/media/du-service-1-w640.webp 640w, https://cdn.jsdelivr.net/gh/AFROAgencyAI/dealer-ultimate@main/media/du-service-1-w960.webp 960w, https://cdn.jsdelivr.net/gh/AFROAgencyAI/dealer-ultimate@main/media/du-service-1-w1280.webp 1280w" sizes="(min-width: 900px) 30vw, 100vw" />
-            <img src="https://cdn.jsdelivr.net/gh/AFROAgencyAI/dealer-ultimate@main/media/du-service-1-w960.jpg" srcset="https://cdn.jsdelivr.net/gh/AFROAgencyAI/dealer-ultimate@main/media/du-service-1-w640.jpg 640w, https://cdn.jsdelivr.net/gh/AFROAgencyAI/dealer-ultimate@main/media/du-service-1-w960.jpg 960w, https://cdn.jsdelivr.net/gh/AFROAgencyAI/dealer-ultimate@main/media/du-service-1-w1280.jpg 1280w" sizes="(min-width: 900px) 30vw, 100vw" alt="" width="960" height="720" decoding="async" loading="lazy" />
+            <img src="https://cdn.jsdelivr.net/gh/AFROAgencyAI/dealer-ultimate@main/media/du-service-1-w960.jpg" srcset="https://cdn.jsdelivr.net/gh/AFROAgencyAI/dealer-ultimate@main/media/du-service-1-w640.jpg 640w, https://cdn.jsdelivr.net/gh/AFROAgencyAI/dealer-ultimate@main/media/du-service-1-w960.jpg 960w, https://cdn.jsdelivr.net/gh/AFROAgencyAI/dealer-ultimate@main/media/du-service-1-w1280.jpg 1280w" sizes="(min-width: 900px) 30vw, 100vw" alt="RV buyback appraisal on a dealership lot" width="960" height="720" decoding="async" loading="lazy" />
           </picture>
           <span class="sol-wash"></span>
         </div>
@@ -2765,7 +2883,7 @@
         <div class="sol-media" aria-hidden="true">
           <picture>
             <source type="image/webp" srcset="https://cdn.jsdelivr.net/gh/AFROAgencyAI/dealer-ultimate@main/media/du-service-2-w640.webp 640w, https://cdn.jsdelivr.net/gh/AFROAgencyAI/dealer-ultimate@main/media/du-service-2-w960.webp 960w, https://cdn.jsdelivr.net/gh/AFROAgencyAI/dealer-ultimate@main/media/du-service-2-w1280.webp 1280w" sizes="(min-width: 900px) 30vw, 100vw" />
-            <img src="https://cdn.jsdelivr.net/gh/AFROAgencyAI/dealer-ultimate@main/media/du-service-2-w960.jpg" srcset="https://cdn.jsdelivr.net/gh/AFROAgencyAI/dealer-ultimate@main/media/du-service-2-w640.jpg 640w, https://cdn.jsdelivr.net/gh/AFROAgencyAI/dealer-ultimate@main/media/du-service-2-w960.jpg 960w, https://cdn.jsdelivr.net/gh/AFROAgencyAI/dealer-ultimate@main/media/du-service-2-w1280.jpg 1280w" sizes="(min-width: 900px) 30vw, 100vw" alt="" width="960" height="720" decoding="async" loading="lazy" />
+            <img src="https://cdn.jsdelivr.net/gh/AFROAgencyAI/dealer-ultimate@main/media/du-service-2-w960.jpg" srcset="https://cdn.jsdelivr.net/gh/AFROAgencyAI/dealer-ultimate@main/media/du-service-2-w640.jpg 640w, https://cdn.jsdelivr.net/gh/AFROAgencyAI/dealer-ultimate@main/media/du-service-2-w960.jpg 960w, https://cdn.jsdelivr.net/gh/AFROAgencyAI/dealer-ultimate@main/media/du-service-2-w1280.jpg 1280w" sizes="(min-width: 900px) 30vw, 100vw" alt="Aged RV inventory marketed to ready buyers" width="960" height="720" decoding="async" loading="lazy" />
           </picture>
           <span class="sol-wash"></span>
         </div>
@@ -2779,7 +2897,7 @@
         <div class="sol-media" aria-hidden="true">
           <picture>
             <source type="image/webp" srcset="https://cdn.jsdelivr.net/gh/AFROAgencyAI/dealer-ultimate@main/media/du-service-3-w640.webp 640w, https://cdn.jsdelivr.net/gh/AFROAgencyAI/dealer-ultimate@main/media/du-service-3-w960.webp 960w, https://cdn.jsdelivr.net/gh/AFROAgencyAI/dealer-ultimate@main/media/du-service-3-w1280.webp 1280w" sizes="(min-width: 900px) 30vw, 100vw" />
-            <img src="https://cdn.jsdelivr.net/gh/AFROAgencyAI/dealer-ultimate@main/media/du-service-3-w960.jpg" srcset="https://cdn.jsdelivr.net/gh/AFROAgencyAI/dealer-ultimate@main/media/du-service-3-w640.jpg 640w, https://cdn.jsdelivr.net/gh/AFROAgencyAI/dealer-ultimate@main/media/du-service-3-w960.jpg 960w, https://cdn.jsdelivr.net/gh/AFROAgencyAI/dealer-ultimate@main/media/du-service-3-w1280.jpg 1280w" sizes="(min-width: 900px) 30vw, 100vw" alt="" width="960" height="720" decoding="async" loading="lazy" />
+            <img src="https://cdn.jsdelivr.net/gh/AFROAgencyAI/dealer-ultimate@main/media/du-service-3-w960.jpg" srcset="https://cdn.jsdelivr.net/gh/AFROAgencyAI/dealer-ultimate@main/media/du-service-3-w640.jpg 640w, https://cdn.jsdelivr.net/gh/AFROAgencyAI/dealer-ultimate@main/media/du-service-3-w960.jpg 960w, https://cdn.jsdelivr.net/gh/AFROAgencyAI/dealer-ultimate@main/media/du-service-3-w1280.jpg 1280w" sizes="(min-width: 900px) 30vw, 100vw" alt="Service bay and trade-in conversation at an RV dealer" width="960" height="720" decoding="async" loading="lazy" />
           </picture>
           <span class="sol-wash"></span>
         </div>
@@ -2795,7 +2913,7 @@
   <!-- Fullpath-style testimonials (Fullpath → Dealer Ultimate; YT links kept) -->
   <section class="t-section" id="proof" aria-label="Testimonials" data-reveal-group>
     <div class="t-head" data-reveal>
-      <h2>Real dealers, real results.</h2>
+      <h2>Real RV dealers, real results.</h2>
       <div class="t-nav t-nav--desktop">
         <button type="button" class="t-arrow t-prev" aria-label="Previous testimonial">
           <svg viewBox="0 0 20 20" fill="none" aria-hidden="true">
@@ -2819,7 +2937,7 @@
 
         <div class="t-video-wrap" id="tVideo">
           <button type="button" class="t-video-btn" id="tVideoBtn" aria-label="Watch the video">
-            <img id="tVideoImg" src="https://cdn.jsdelivr.net/gh/AFROAgencyAI/dealer-ultimate@main/media/testimonial-emily-video.webp" loading="lazy" decoding="async" alt="" width="491" height="295" />
+            <img id="tVideoImg" src="https://cdn.jsdelivr.net/gh/AFROAgencyAI/dealer-ultimate@main/media/testimonial-emily-video.webp" loading="lazy" decoding="async" alt="Video testimonial from an RV dealership marketing leader" width="491" height="295" />
             <span class="t-video-shade" aria-hidden="true"></span>
             <span class="t-play" aria-hidden="true">
               <svg viewBox="0 0 20 20" aria-hidden="true">
@@ -2886,7 +3004,7 @@
       </figure>
 
       <div class="lead-card" data-reveal>
-        <h2>Get in touch!</h2>
+        <h2>Get a demo for your RV dealership</h2>
         <form class="lead-form" id="leadForm" novalidate>
           <div class="lead-fields">
             <label for="leadName">Name</label>
@@ -2922,7 +3040,7 @@
     <div class="site-footer-top" data-reveal>
       <div class="foot-brand-block">
         <div class="foot-brand">
-          <img src="https://cdn.jsdelivr.net/gh/AFROAgencyAI/dealer-ultimate@main/media/du-logo-mark-68.png" alt="" width="32" height="32" loading="lazy" decoding="async" />
+          <img src="https://cdn.jsdelivr.net/gh/AFROAgencyAI/dealer-ultimate@main/media/du-logo-mark-68.png" alt="Dealer Ultimate" width="32" height="32" loading="lazy" decoding="async" />
           Dealer Ultimate
         </div>
         <p class="foot-tag">Inventory and buyers on the lot for independent RV dealers.</p>
