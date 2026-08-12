@@ -262,11 +262,27 @@
       overflow-x: clip;
     }
 
+    /*
+      Mobile: keep design gutters (--page-inset / --inner). Do NOT zero them.
+      The 100vw breakout is only for true GHL embeds (body.du-ghl), where the
+      parent Section/Row/Column adds its own padding we need to escape.
+      Portfolio / standalone hosts must keep normal width + gutters.
+    */
     @media (max-width: 899px) {
       .du-ghl-root {
-        /* Kill design outer gutters on mobile when embedded (GHL already full-bleed) */
-        --page-inset: 0px;
+        --page-inset: 12px;
         --inner: 16px;
+      }
+
+      body.du-ghl {
+        width: 100% !important;
+        max-width: 100% !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        overflow-x: clip;
+      }
+
+      body.du-ghl .du-ghl-root {
         width: 100vw !important;
         max-width: 100vw !important;
         position: relative;
@@ -279,36 +295,27 @@
         box-sizing: border-box;
       }
 
-      body.du-ghl {
-        width: 100vw !important;
-        max-width: 100vw !important;
-        margin: 0 !important;
-        padding: 0 !important;
-        overflow-x: clip;
-      }
-
       .du-ghl-root .variant {
         width: auto;
         max-width: none;
-        margin-left: 0;
-        margin-right: 0;
+        margin-top: 0;
+        margin-left: var(--page-inset);
+        margin-right: var(--page-inset);
+        margin-bottom: var(--page-inset);
         box-sizing: border-box;
       }
 
-      /* Floating header: still inset slightly from screen edge for chrome depth */
       .du-ghl-root .fake-head {
-        --page-inset: 10px;
-        top: 10px;
-        margin-top: 10px;
-        margin-left: 10px;
-        margin-right: 10px;
-        margin-bottom: calc(-1 * (10px + 10px + var(--head-h)));
+        top: var(--page-inset);
+        margin-top: var(--page-inset);
+        margin-left: calc(var(--page-inset) * 2);
+        margin-right: calc(var(--page-inset) * 2);
+        margin-bottom: calc(-1 * (var(--page-inset) + var(--head-h)));
       }
 
       .du-ghl-root .hero-a {
-        --page-inset: 0px;
-        border-radius: 0;
-        padding-top: calc(10px + var(--head-h) + 12px);
+        border-radius: 0 0 var(--radius) var(--radius);
+        padding-top: calc(var(--page-inset) + var(--head-h) + var(--page-inset));
       }
     }
 
@@ -344,8 +351,12 @@
       background: none;
     }
 
+    /*
+      Hero tile: flush to the top of .du-ghl-root so the cream wash fills
+      from y=0 (no stone strip above the header). Side + bottom gutters stay.
+    */
     .variant {
-      margin: var(--page-inset);
+      margin: 0 var(--page-inset) var(--page-inset);
       max-width: none;
       padding: 0;
     }
@@ -423,30 +434,32 @@
     .hero-a {
       position: relative;
       background: linear-gradient(180deg, var(--wash-top) 0%, var(--wash-mid) 45%, #fff 100%);
-      border-radius: var(--radius);
+      /* Top flush with page; radius only on bottom corners of the hero tile */
+      border-radius: 0 0 var(--radius) var(--radius);
       overflow: visible;
       border: 1px solid rgba(28, 25, 23, 0.06);
+      border-top: none;
       /*
-        Floating header gutters use --page-inset only (same as screen → tile).
-        padding-top = into-tile gutter + bar + gutter under bar.
+        Floating header: top of hero is page top, so one page-inset above the bar
+        + bar + one page-inset under the bar before copy.
       */
       padding-top: calc(var(--page-inset) + var(--head-h) + var(--page-inset));
       padding-bottom: clamp(2rem, 4vw, 2.75rem);
     }
 
     /*
-      Floating sticky header — sticks full page.
-      All gutters = --page-inset (narrow strip between screen edge and cream tile).
-      Start: page-inset (to tile) + page-inset (into tile) on top and sides.
+      Floating sticky header.
+      Top: one page-inset from viewport top (hero wash fills under it).
+      Sides: page-inset (to tile edge) + page-inset (into tile) = 2x.
     */
     .fake-head {
       position: sticky;
       top: var(--page-inset);
       z-index: 50;
-      margin-top: calc(var(--page-inset) + var(--page-inset));
+      margin-top: var(--page-inset);
       margin-right: calc(var(--page-inset) + var(--page-inset));
       margin-left: calc(var(--page-inset) + var(--page-inset));
-      margin-bottom: calc(-1 * (var(--page-inset) + var(--page-inset) + var(--head-h)));
+      margin-bottom: calc(-1 * (var(--page-inset) + var(--head-h)));
       display: flex;
       align-items: center;
       justify-content: space-between;
@@ -3096,6 +3109,9 @@
   <script>
     /* Zero padding on GHL Section/Row/Column ancestors (survives when body is stripped) */
     (function stripGhlChrome() {
+      /* Only when pasted as GHL page (body.du-ghl). Never strip host gutters
+         on portfolio embeds like afroagency.ai or local file previews. */
+      if (!document.body || !document.body.classList.contains("du-ghl")) return;
       var root = document.querySelector(".du-ghl-root");
       if (!root) return;
       var el = root.parentElement;
