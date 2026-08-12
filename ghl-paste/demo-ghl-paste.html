@@ -2226,18 +2226,27 @@
     window.DU_MEDIA_BASE = window.DU_MEDIA_BASE || "https://cdn.jsdelivr.net/gh/AFROAgencyAI/dealer-ultimate@main/media/";
     window.duMediaUrl = function (path) {
       if (!path) return path;
+      path = String(path);
+      /* Already absolute (CDN-wired testimonial / hero URLs) — never re-prefix */
+      if (/^https?:\/\//i.test(path) || path.indexOf("//") === 0) return path;
       var base = window.DU_MEDIA_BASE || "";
       if (!base) return path;
       if (base.slice(-1) !== "/") base += "/";
-      return base + String(path).replace(/^media\//, "");
+      return base + path.replace(/^media\//, "");
     };
     (function () {
       if (!window.DU_MEDIA_BASE) return;
-      document.querySelectorAll('img[src^="media/"]').forEach(function (img) {
-        img.src = window.duMediaUrl(img.getAttribute("src"));
+      document.querySelectorAll("img[src]").forEach(function (img) {
+        var s = img.getAttribute("src");
+        if (!s || /^https?:\/\//i.test(s)) return;
+        if (s.indexOf("media/") !== 0) return;
+        img.src = window.duMediaUrl(s);
       });
-      var icon = document.querySelector('link[rel="icon"][href^="media/"]');
-      if (icon) icon.href = window.duMediaUrl(icon.getAttribute("href"));
+      var icon = document.querySelector('link[rel="icon"][href]');
+      if (icon) {
+        var h = icon.getAttribute("href");
+        if (h && h.indexOf("media/") === 0) icon.href = window.duMediaUrl(h);
+      }
     })();
   </script>
 
@@ -2855,6 +2864,7 @@
         var dotsHosts = Array.prototype.slice.call(document.querySelectorAll("[data-t-dots]"));
         if (!stack || !prevBtns.length || !nextBtns.length) return;
 
+        /* Resolve relative media/ only; leave full CDN URLs alone */
         if (window.duMediaUrl) {
           people.forEach(function (p) {
             p.avatar = window.duMediaUrl(p.avatar);
