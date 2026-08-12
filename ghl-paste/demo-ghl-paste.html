@@ -92,37 +92,10 @@
 
     /*
       GHL paste: Custom HTML is nested in Section/Row/Column with padding.
-      GHL also often strips <body class="du-ghl">
-
-  <script>
-    /* Default media base = public GitHub CDN */
-    window.DU_MEDIA_BASE = window.DU_MEDIA_BASE || "https://cdn.jsdelivr.net/gh/AFROAgencyAI/dealer-ultimate@main/media/";
-    window.duMediaUrl = function (path) {
-      if (!path) return path;
-      path = String(path);
-      if (/^https?:\/\//i.test(path) || path.indexOf("//") === 0) return path;
-      var base = window.DU_MEDIA_BASE || "";
-      if (!base) return path;
-      if (base.slice(-1) !== "/") base += "/";
-      return base + path.replace(/^media\//, "");
-    };
-    (function () {
-      if (!window.DU_MEDIA_BASE) return;
-      document.querySelectorAll("img[src]").forEach(function (img) {
-        var s = img.getAttribute("src");
-        if (!s || /^https?:\/\//i.test(s)) return;
-        if (s.indexOf("media/") !== 0) return;
-        img.src = window.duMediaUrl(s);
-      });
-      var icon = document.querySelector('link[rel="icon"][href]');
-      if (icon) {
-        var h = icon.getAttribute("href");
-        if (h && h.indexOf("media/") === 0) icon.href = window.duMediaUrl(h);
-      }
-    })();
-  </script>
-, so breakout must live on .du-ghl-root
-      (a wrapper that survives paste), not only on body.du-ghl.
+      GHL also often strips the body element, so breakout must live on
+      .du-ghl-root (a wrapper that survives paste), not only on body.du-ghl.
+      (Do not write the body tag as angle-brackets in this comment: the GHL
+      build script matches that string when injecting the media bootstrap.)
     */
     .du-ghl-root {
       width: 100%;
@@ -2345,14 +2318,43 @@
   </style>
 </head>
 
-<body>
+<body class="du-ghl">
+
+  <script>
+    /* Default media base = public GitHub CDN */
+    window.DU_MEDIA_BASE = window.DU_MEDIA_BASE || "https://cdn.jsdelivr.net/gh/AFROAgencyAI/dealer-ultimate@main/media/";
+    window.duMediaUrl = function (path) {
+      if (!path) return path;
+      path = String(path);
+      if (/^https?:\/\//i.test(path) || path.indexOf("//") === 0) return path;
+      var base = window.DU_MEDIA_BASE || "";
+      if (!base) return path;
+      if (base.slice(-1) !== "/") base += "/";
+      return base + path.replace(/^media\//, "");
+    };
+    (function () {
+      if (!window.DU_MEDIA_BASE) return;
+      document.querySelectorAll("img[src]").forEach(function (img) {
+        var s = img.getAttribute("src");
+        if (!s || /^https?:\/\//i.test(s)) return;
+        if (s.indexOf("media/") !== 0) return;
+        img.src = window.duMediaUrl(s);
+      });
+      var icon = document.querySelector('link[rel="icon"][href]');
+      if (icon) {
+        var h = icon.getAttribute("href");
+        if (h && h.indexOf("media/") === 0) icon.href = window.duMediaUrl(h);
+      }
+    })();
+  </script>
+
   <div class="du-ghl-root">
   <header class="fake-head" id="siteHeader">
     <div class="logo">
       <img src="https://cdn.jsdelivr.net/gh/AFROAgencyAI/dealer-ultimate@main/media/du-logo-mark.png" alt="" width="34" height="34" />
-      <span class="logo-wordmark" aria-label="Dealer Ultimate">
-        <span>DEALER</span>
-        <span>ULTIMATE</span>
+      <span class="logo-wordmark" role="img" aria-label="Dealer Ultimate">
+        <span aria-hidden="true">DEALER</span>
+        <span aria-hidden="true">ULTIMATE</span>
       </span>
     </div>
     <nav class="links" aria-label="Primary">
@@ -2727,7 +2729,7 @@
                 <path d="M6.5 4.5v11l10-5.5-10-5.5z" />
               </svg>
             </span>
-            <p class="t-quote-on-video" id="tQuoteDesktop"></p>
+            <span class="t-quote-on-video" id="tQuoteDesktop"></span>
           </button>
         </div>
       </div>
