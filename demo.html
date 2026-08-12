@@ -807,8 +807,12 @@
     .sol-card {
       position: relative;
       overflow: hidden;
-      min-height: 17.5rem;
-      padding: 1.35rem 1.25rem 1.25rem;
+      width: 100%;
+      /* Cap at 4:3 landscape — never taller than width × 3/4 */
+      aspect-ratio: 4 / 3;
+      min-height: 0;
+      max-height: none;
+      padding: 1.15rem 1.15rem 1.1rem;
       display: flex;
       flex-direction: column;
       border-radius: var(--radius);
@@ -871,25 +875,33 @@
       z-index: 1;
       display: flex;
       flex-direction: column;
-      flex: 1;
+      flex: 1 1 auto;
       min-height: 0;
+      height: 100%;
     }
 
     .sol-card h3 {
       font-family: var(--display);
       font-weight: 800;
-      font-size: 1.3rem;
+      font-size: clamp(1.1rem, 2.4vw, 1.3rem);
       letter-spacing: -0.02em;
       line-height: 1.1;
       color: #1c1917;
+      flex-shrink: 0;
     }
 
     .sol-card p {
-      margin-top: 0.55rem;
-      font-size: 0.95rem;
-      line-height: 1.45;
+      margin-top: 0.45rem;
+      font-size: clamp(0.88rem, 1.8vw, 0.95rem);
+      line-height: 1.4;
       color: #3f2920;
       max-width: 28ch;
+      /* Keep copy inside 4:3 frame; photo + CTA still read */
+      overflow: hidden;
+      display: -webkit-box;
+      -webkit-box-orient: vertical;
+      -webkit-line-clamp: 4;
+      line-clamp: 4;
     }
 
     /*

@@ -1,15 +1,16 @@
 <!DOCTYPE html>
 <!--
   Dealer Ultimate — GHL paste version (CDN-wired)
-  -----------------------------------------------
-  Media is hosted on GitHub and served via jsDelivr:
-    https://cdn.jsdelivr.net/gh/AFROAgencyAI/dealer-ultimate@main/media/<file>
-
-  Repo: https://github.com/AFROAgencyAI/dealer-ultimate
-
-  In GHL: blank/custom page → paste this full HTML file.
-  Wire #leadForm to a GHL form/webhook when you go live.
-  Rebuild from monorepo demo.html then re-push media + this file.
+  ------------------------------------
+  1. Upload everything in ./media/ to GHL Media Library (or host on your CDN).
+  2. If media URLs are absolute CDN links, set DU_MEDIA_BASE below to that folder
+     URL (with trailing slash), e.g.
+       window.DU_MEDIA_BASE = "https://storage.googleapis.com/msgsndr/XXXX/media/";
+     Leave "" to use relative media/ paths (works when HTML and media/ ship together).
+  3. In GHL: blank/custom page → Custom Code / HTML element → paste this full file
+     (or paste <head> CSS+JS into site header and body into a full-width code block).
+  4. Wire the #leadForm submit to a GHL form / webhook when you go live.
+  Built from demo.html. Rebuild: python3 du-deliverables/build-ghl-paste.py
 -->
 <html lang="en">
 
@@ -803,8 +804,12 @@
     .sol-card {
       position: relative;
       overflow: hidden;
-      min-height: 17.5rem;
-      padding: 1.35rem 1.25rem 1.25rem;
+      width: 100%;
+      /* Cap at 4:3 landscape — never taller than width × 3/4 */
+      aspect-ratio: 4 / 3;
+      min-height: 0;
+      max-height: none;
+      padding: 1.15rem 1.15rem 1.1rem;
       display: flex;
       flex-direction: column;
       border-radius: var(--radius);
@@ -867,25 +872,33 @@
       z-index: 1;
       display: flex;
       flex-direction: column;
-      flex: 1;
+      flex: 1 1 auto;
       min-height: 0;
+      height: 100%;
     }
 
     .sol-card h3 {
       font-family: var(--display);
       font-weight: 800;
-      font-size: 1.3rem;
+      font-size: clamp(1.1rem, 2.4vw, 1.3rem);
       letter-spacing: -0.02em;
       line-height: 1.1;
       color: #1c1917;
+      flex-shrink: 0;
     }
 
     .sol-card p {
-      margin-top: 0.55rem;
-      font-size: 0.95rem;
-      line-height: 1.45;
+      margin-top: 0.45rem;
+      font-size: clamp(0.88rem, 1.8vw, 0.95rem);
+      line-height: 1.4;
       color: #3f2920;
       max-width: 28ch;
+      /* Keep copy inside 4:3 frame; photo + CTA still read */
+      overflow: hidden;
+      display: -webkit-box;
+      -webkit-box-orient: vertical;
+      -webkit-line-clamp: 4;
+      line-clamp: 4;
     }
 
     /*
@@ -2227,7 +2240,7 @@
     window.duMediaUrl = function (path) {
       if (!path) return path;
       path = String(path);
-      /* Already absolute (CDN-wired testimonial / hero URLs) — never re-prefix */
+      /* Already absolute (CDN-wired) — never re-prefix */
       if (/^https?:\/\//i.test(path) || path.indexOf("//") === 0) return path;
       var base = window.DU_MEDIA_BASE || "";
       if (!base) return path;
@@ -2864,7 +2877,6 @@
         var dotsHosts = Array.prototype.slice.call(document.querySelectorAll("[data-t-dots]"));
         if (!stack || !prevBtns.length || !nextBtns.length) return;
 
-        /* Resolve relative media/ only; leave full CDN URLs alone */
         if (window.duMediaUrl) {
           people.forEach(function (p) {
             p.avatar = window.duMediaUrl(p.avatar);
