@@ -12,6 +12,7 @@
 <html lang="en">
 
 <head>
+  <script>document.documentElement.classList.add('js');</script>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Dealer Ultimate</title>
@@ -53,16 +54,32 @@
       font-display: swap;
     }
 
-    /* Below-the-fold sections: skip layout/paint until near viewport */
-    .trust-section,
-    .stat-section,
-    .how-section,
-    .sol-section,
-    .t-section,
-    .lead-section,
-    .site-footer {
-      content-visibility: auto;
-      contain-intrinsic-size: auto 480px;
+    /*
+      Scroll / load reveal (Awwwards-style fade-up).
+      Whole unit moves together so card + text never desync.
+      Only applied when html.js is set (see head script).
+    */
+    html.js [data-reveal],
+    html.js [data-reveal-hero] {
+      opacity: 0;
+      transform: translate3d(0, 2.25rem, 0);
+      will-change: transform, opacity;
+    }
+
+    html.js [data-reveal].is-revealed,
+    html.js [data-reveal-hero].is-revealed {
+      opacity: 1;
+      transform: none;
+      will-change: auto;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      html.js [data-reveal],
+      html.js [data-reveal-hero] {
+        opacity: 1 !important;
+        transform: none !important;
+        will-change: auto;
+      }
     }
 
     .hero-photo picture,
@@ -2437,16 +2454,16 @@
     <section class="hero-a" aria-label="Hero">
       <div class="hero-stage">
         <div class="hero-text">
-          <h1>We help independent RV dealers find the units and the buyers</h1>
-          <p class="sub">
+          <h1 data-reveal-hero>We help independent RV dealers find the units and the buyers</h1>
+          <p class="sub" data-reveal-hero>
             We put inventory and buyers on your lot so you can sell more. <span class="deal-accent">Deal?</span>
           </p>
-          <div class="hero-actions">
+          <div class="hero-actions" data-reveal-hero>
             <a class="btn-primary" href="#demo">Get a Demo</a>
             <a class="btn-ghost" href="#how">See how it works</a>
           </div>
 
-          <div class="select-wrap" id="select">
+          <div class="select-wrap" id="select" data-reveal-hero>
             <div class="select-box">
               <div class="select-label">I’m looking for a way to…</div>
               <div class="select-field">
@@ -2482,7 +2499,7 @@
             </div>
           </div>
         </div>
-        <div class="hero-photo">
+        <div class="hero-photo" data-reveal-hero>
           <picture>
             <source type="image/webp"
               srcset="https://cdn.jsdelivr.net/gh/AFROAgencyAI/dealer-ultimate@main/media/du-hero-1-w640.webp 640w, https://cdn.jsdelivr.net/gh/AFROAgencyAI/dealer-ultimate@main/media/du-hero-1-w960.webp 960w, https://cdn.jsdelivr.net/gh/AFROAgencyAI/dealer-ultimate@main/media/du-hero-1-w1280.webp 1280w"
@@ -2498,9 +2515,9 @@
     </section>
   </div>
 
-  <section class="trust-section" id="trust" aria-label="Dealers we work with">
-    <p class="trust-headline">Trusted by 200+ top dealers across North America</p>
-    <div class="trust-bar">
+  <section class="trust-section" id="trust" aria-label="Dealers we work with" data-reveal-group>
+    <p class="trust-headline" data-reveal>Trusted by 200+ top dealers across North America</p>
+    <div class="trust-bar" data-reveal>
       <div class="trust-track">
         <div class="trust-group">
           <img src="https://cdn.jsdelivr.net/gh/AFROAgencyAI/dealer-ultimate@main/media/trust-Group-62200.png" alt="" height="32" width="80" decoding="async" />
@@ -2537,9 +2554,9 @@
   </section>
 
   <!-- Fullpath-style stats + mini viz, DealerNerds case-study numbers -->
-  <section class="stats-section" id="results" aria-label="Results">
+  <section class="stats-section" id="results" aria-label="Results" data-reveal-group>
     <div class="stats-grid">
-      <article class="stat-card">
+      <article class="stat-card" data-reveal>
         <div class="stat-viz" aria-hidden="true"><svg viewBox="0 0 360 220" preserveAspectRatio="xMidYMax slice"
             xmlns="http://www.w3.org/2000/svg" focusable="false">
             <path
@@ -2565,7 +2582,7 @@
           <div class="stat-num">$25M</div>
         </div>
       </article>
-      <article class="stat-card">
+      <article class="stat-card" data-reveal>
         <div class="stat-viz" aria-hidden="true"><svg viewBox="0 0 360 220" preserveAspectRatio="xMidYMax slice"
             xmlns="http://www.w3.org/2000/svg" focusable="false">
             <rect x="3.0" y="198.0" width="6.0" height="16.0" rx="3" fill="#FAFAF9" opacity="0.200" />
@@ -2605,7 +2622,7 @@
           <div class="stat-num">1,200</div>
         </div>
       </article>
-      <article class="stat-card">
+      <article class="stat-card" data-reveal>
         <div class="stat-viz" aria-hidden="true"><svg viewBox="0 0 360 220" preserveAspectRatio="xMidYMax slice"
             xmlns="http://www.w3.org/2000/svg" focusable="false">
             <path d="M -6 150 L 52 138" stroke="rgba(250,250,249,.2)" stroke-width="1.4" />
@@ -2650,11 +2667,11 @@
     </div>
   </section>
 
-  <section class="how-section" id="how" aria-labelledby="how-heading">
-    <h2 id="how-heading">How it works</h2>
+  <section class="how-section" id="how" aria-labelledby="how-heading" data-reveal-group>
+    <h2 id="how-heading" data-reveal>How it works</h2>
     <div class="how-tx" id="howTx">
       <!-- Shared image outside accordion — mobile above list, desktop left -->
-      <div class="how-tx-media" aria-hidden="true">
+      <div class="how-tx-media" aria-hidden="true" data-reveal>
         <div class="how-tx-shot is-active" data-how="buyers">
           <picture>
             <source type="image/webp" srcset="https://cdn.jsdelivr.net/gh/AFROAgencyAI/dealer-ultimate@main/media/du-more-buyers-1-w640.webp 640w, https://cdn.jsdelivr.net/gh/AFROAgencyAI/dealer-ultimate@main/media/du-more-buyers-1-w960.webp 960w, https://cdn.jsdelivr.net/gh/AFROAgencyAI/dealer-ultimate@main/media/du-more-buyers-1-w1280.webp 1280w" sizes="(min-width: 900px) 42vw, 100vw" />
@@ -2677,7 +2694,7 @@
       </div>
 
       <div class="how-tx-list">
-        <div class="how-item is-open" data-how="buyers">
+        <div class="how-item is-open" data-reveal data-how="buyers">
           <button type="button" class="how-trigger" aria-expanded="true" aria-controls="how-panel-buyers"
             id="how-tab-buyers">
             <span class="step-num">01</span>
@@ -2691,7 +2708,7 @@
           </div>
         </div>
 
-        <div class="how-item" data-how="inventory">
+        <div class="how-item" data-reveal data-how="inventory">
           <button type="button" class="how-trigger" aria-expanded="false" aria-controls="how-panel-inventory"
             id="how-tab-inventory">
             <span class="step-num">02</span>
@@ -2705,7 +2722,7 @@
           </div>
         </div>
 
-        <div class="how-item" data-how="sales">
+        <div class="how-item" data-reveal data-how="sales">
           <button type="button" class="how-trigger" aria-expanded="false" aria-controls="how-panel-sales"
             id="how-tab-sales">
             <span class="step-num">03</span>
@@ -2718,7 +2735,7 @@
           </div>
         </div>
 
-        <div class="how-foot">
+        <div class="how-foot" data-reveal>
           <p class="deal-line">Bottom line: you sell more units. <span class="deal-accent">Deal?</span></p>
           <a class="btn-primary" href="#demo">Get a Demo</a>
         </div>
@@ -2727,10 +2744,10 @@
   </section>
 
   <!-- Solutions — three flagship services, copy locked in du-research/09-SOLUTIONS.md -->
-  <section class="sol-section" id="solutions" aria-labelledby="sol-heading">
-    <h2 id="sol-heading">Where do you want to start?</h2>
+  <section class="sol-section" id="solutions" aria-labelledby="sol-heading" data-reveal-group>
+    <h2 id="sol-heading" data-reveal>Where do you want to start?</h2>
     <div class="sol-grid">
-      <article class="sol-card">
+      <article class="sol-card" data-reveal>
         <div class="sol-media" aria-hidden="true">
           <picture>
             <source type="image/webp" srcset="https://cdn.jsdelivr.net/gh/AFROAgencyAI/dealer-ultimate@main/media/du-service-1-w640.webp 640w, https://cdn.jsdelivr.net/gh/AFROAgencyAI/dealer-ultimate@main/media/du-service-1-w960.webp 960w, https://cdn.jsdelivr.net/gh/AFROAgencyAI/dealer-ultimate@main/media/du-service-1-w1280.webp 1280w" sizes="(min-width: 900px) 30vw, 100vw" />
@@ -2744,7 +2761,7 @@
           <a class="btn-primary btn-primary--sm sol-more" href="#demo">Learn more<span class="sr-only"> about Buyback</span></a>
         </div>
       </article>
-      <article class="sol-card">
+      <article class="sol-card" data-reveal>
         <div class="sol-media" aria-hidden="true">
           <picture>
             <source type="image/webp" srcset="https://cdn.jsdelivr.net/gh/AFROAgencyAI/dealer-ultimate@main/media/du-service-2-w640.webp 640w, https://cdn.jsdelivr.net/gh/AFROAgencyAI/dealer-ultimate@main/media/du-service-2-w960.webp 960w, https://cdn.jsdelivr.net/gh/AFROAgencyAI/dealer-ultimate@main/media/du-service-2-w1280.webp 1280w" sizes="(min-width: 900px) 30vw, 100vw" />
@@ -2758,7 +2775,7 @@
           <a class="btn-primary btn-primary--sm sol-more" href="#demo">Learn more<span class="sr-only"> about Move Units</span></a>
         </div>
       </article>
-      <article class="sol-card">
+      <article class="sol-card" data-reveal>
         <div class="sol-media" aria-hidden="true">
           <picture>
             <source type="image/webp" srcset="https://cdn.jsdelivr.net/gh/AFROAgencyAI/dealer-ultimate@main/media/du-service-3-w640.webp 640w, https://cdn.jsdelivr.net/gh/AFROAgencyAI/dealer-ultimate@main/media/du-service-3-w960.webp 960w, https://cdn.jsdelivr.net/gh/AFROAgencyAI/dealer-ultimate@main/media/du-service-3-w1280.webp 1280w" sizes="(min-width: 900px) 30vw, 100vw" />
@@ -2776,8 +2793,8 @@
   </section>
 
   <!-- Fullpath-style testimonials (Fullpath → Dealer Ultimate; YT links kept) -->
-  <section class="t-section" id="proof" aria-label="Testimonials">
-    <div class="t-head">
+  <section class="t-section" id="proof" aria-label="Testimonials" data-reveal-group>
+    <div class="t-head" data-reveal>
       <h2>Real dealers, real results.</h2>
       <div class="t-nav t-nav--desktop">
         <button type="button" class="t-arrow t-prev" aria-label="Previous testimonial">
@@ -2797,7 +2814,7 @@
     </div>
 
     <div class="t-body">
-      <div class="t-grid">
+      <div class="t-grid" data-reveal>
         <div class="t-stack" id="tStack" aria-live="polite"></div>
 
         <div class="t-video-wrap" id="tVideo">
@@ -2859,16 +2876,16 @@
   </div>
 
   <!-- Lead form (Fullpath fields → Dealer Ultimate); left image / right form -->
-  <section class="lead-section" id="demo" aria-label="Get a demo">
+  <section class="lead-section" id="demo" aria-label="Get a demo" data-reveal-group>
     <div class="lead-layout">
-      <figure class="lead-media">
+      <figure class="lead-media" data-reveal>
         <picture>
             <source type="image/webp" srcset="https://cdn.jsdelivr.net/gh/AFROAgencyAI/dealer-ultimate@main/media/du-contact-1-w640.webp 640w, https://cdn.jsdelivr.net/gh/AFROAgencyAI/dealer-ultimate@main/media/du-contact-1-w960.webp 960w, https://cdn.jsdelivr.net/gh/AFROAgencyAI/dealer-ultimate@main/media/du-contact-1-w1280.webp 1280w" sizes="(min-width: 900px) 42vw, 100vw" />
             <img src="https://cdn.jsdelivr.net/gh/AFROAgencyAI/dealer-ultimate@main/media/du-contact-1-w960.jpg" srcset="https://cdn.jsdelivr.net/gh/AFROAgencyAI/dealer-ultimate@main/media/du-contact-1-w640.jpg 640w, https://cdn.jsdelivr.net/gh/AFROAgencyAI/dealer-ultimate@main/media/du-contact-1-w960.jpg 960w, https://cdn.jsdelivr.net/gh/AFROAgencyAI/dealer-ultimate@main/media/du-contact-1-w1280.jpg 1280w" sizes="(min-width: 900px) 42vw, 100vw" alt="Dealership principal and salesperson walking the RV lot at sunset" width="960" height="720" decoding="async" loading="lazy" />
           </picture>
       </figure>
 
-      <div class="lead-card">
+      <div class="lead-card" data-reveal>
         <h2>Get in touch!</h2>
         <form class="lead-form" id="leadForm" novalidate>
           <div class="lead-fields">
@@ -2901,8 +2918,8 @@
     </div>
   </section>
 
-  <footer class="site-footer">
-    <div class="site-footer-top">
+  <footer class="site-footer" data-reveal-group>
+    <div class="site-footer-top" data-reveal>
       <div class="foot-brand-block">
         <div class="foot-brand">
           <img src="https://cdn.jsdelivr.net/gh/AFROAgencyAI/dealer-ultimate@main/media/du-logo-mark-68.png" alt="" width="32" height="32" loading="lazy" decoding="async" />
@@ -2954,6 +2971,10 @@
   </footer>
   </div><!-- /.du-ghl-root -->
 
+
+  <!-- GSAP at end of body so first paint stays free of hero-blocking work; scripts are tiny vs images -->
+  <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.7/dist/gsap.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.7/dist/ScrollTrigger.min.js"></script>
   <script>
     /* Zero padding on GHL Section/Row/Column ancestors (survives when body is stripped) */
     (function stripGhlChrome() {
@@ -3543,6 +3564,102 @@
       syncHeroPhoto();
       requestAnimationFrame(syncHeroPhoto);
     })();
+
+    /* Premium fade-up reveals: whole card units, sequential stagger (GSAP + ScrollTrigger) */
+    (function initDuReveal() {
+      function markRevealed(els) {
+        els.forEach(function (el) {
+          el.classList.add("is-revealed");
+        });
+      }
+
+      function run() {
+        var nodes = document.querySelectorAll("[data-reveal], [data-reveal-hero]");
+        if (!nodes.length) return;
+
+        var reduce =
+          window.matchMedia &&
+          window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+        if (reduce || !window.gsap) {
+          markRevealed(Array.prototype.slice.call(nodes));
+          return;
+        }
+
+        if (window.ScrollTrigger) gsap.registerPlugin(ScrollTrigger);
+
+        var Y = 36;
+        var DUR = 0.8;
+        var STAGGER = 0.12;
+        var EASE = "power3.out";
+
+        /* Hero: load sequence (top half) */
+        var hero = gsap.utils.toArray("[data-reveal-hero]");
+        if (hero.length) {
+          gsap.fromTo(
+            hero,
+            { y: Y, opacity: 0 },
+            {
+              y: 0,
+              opacity: 1,
+              duration: DUR,
+              ease: EASE,
+              stagger: STAGGER,
+              delay: 0.06,
+              onComplete: function () {
+                markRevealed(hero);
+                gsap.set(hero, { clearProps: "transform" });
+              }
+            }
+          );
+        }
+
+        /* Scroll groups: cards/headings in DOM order, whole unit (text rides along) */
+        gsap.utils.toArray("[data-reveal-group]").forEach(function (group) {
+          var items = gsap.utils.toArray(group.querySelectorAll("[data-reveal]")).filter(
+            function (el) {
+              var p = el.parentElement;
+              while (p && p !== group) {
+                if (p.hasAttribute && p.hasAttribute("data-reveal")) return false;
+                p = p.parentElement;
+              }
+              return true;
+            }
+          );
+          if (!items.length) return;
+
+          gsap.fromTo(
+            items,
+            { y: Y, opacity: 0 },
+            {
+              y: 0,
+              opacity: 1,
+              duration: DUR,
+              ease: EASE,
+              stagger: STAGGER,
+              scrollTrigger: {
+                trigger: group,
+                start: "top 82%",
+                once: true,
+                invalidateOnRefresh: true
+              },
+              onComplete: function () {
+                markRevealed(items);
+                gsap.set(items, { clearProps: "transform" });
+              }
+            }
+          );
+        });
+      }
+
+      run();
+      if (window.ScrollTrigger) {
+        window.addEventListener("load", function () {
+          ScrollTrigger.refresh();
+        });
+      }
+    })();
+
   </script>
 </body>
 
