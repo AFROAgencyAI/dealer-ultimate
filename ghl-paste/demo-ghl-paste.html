@@ -298,23 +298,20 @@
       .du-ghl-root .variant {
         width: auto;
         max-width: none;
-        margin-top: 0;
-        margin-left: var(--page-inset);
-        margin-right: var(--page-inset);
-        margin-bottom: var(--page-inset);
+        margin: var(--page-inset);
         box-sizing: border-box;
       }
 
       .du-ghl-root .fake-head {
         top: var(--page-inset);
-        margin-top: var(--page-inset);
+        margin-top: calc(var(--page-inset) * 2);
         margin-left: calc(var(--page-inset) * 2);
         margin-right: calc(var(--page-inset) * 2);
-        margin-bottom: calc(-1 * (var(--page-inset) + var(--head-h)));
+        margin-bottom: calc(-1 * (var(--page-inset) * 2 + var(--head-h)));
       }
 
       .du-ghl-root .hero-a {
-        border-radius: 0 0 var(--radius) var(--radius);
+        border-radius: var(--radius);
         padding-top: calc(var(--page-inset) + var(--head-h) + var(--page-inset));
       }
     }
@@ -352,11 +349,11 @@
     }
 
     /*
-      Hero tile: flush to the top of .du-ghl-root so the cream wash fills
-      from y=0 (no stone strip above the header). Side + bottom gutters stay.
+      Hero sits as a floating cream tile on the stone page: gutters on all
+      four sides so top-left / top-right radius stay visible.
     */
     .variant {
-      margin: 0 var(--page-inset) var(--page-inset);
+      margin: var(--page-inset);
       max-width: none;
       padding: 0;
     }
@@ -434,32 +431,29 @@
     .hero-a {
       position: relative;
       background: linear-gradient(180deg, var(--wash-top) 0%, var(--wash-mid) 45%, #fff 100%);
-      /* Top flush with page; radius only on bottom corners of the hero tile */
-      border-radius: 0 0 var(--radius) var(--radius);
+      border-radius: var(--radius);
       overflow: visible;
       border: 1px solid rgba(28, 25, 23, 0.06);
-      border-top: none;
       /*
-        Floating header: top of hero is page top, so one page-inset above the bar
-        + bar + one page-inset under the bar before copy.
+        Floating header gutters use --page-inset (same as screen → tile).
+        padding-top = into-tile gutter + bar + gutter under bar.
       */
       padding-top: calc(var(--page-inset) + var(--head-h) + var(--page-inset));
       padding-bottom: clamp(2rem, 4vw, 2.75rem);
     }
 
     /*
-      Floating sticky header.
-      Top: one page-inset from viewport top (hero wash fills under it).
-      Sides: page-inset (to tile edge) + page-inset (into tile) = 2x.
+      Floating sticky header — sticks full page.
+      Gutters = page-inset (screen → tile) + page-inset (into tile) on top and sides.
     */
     .fake-head {
       position: sticky;
       top: var(--page-inset);
       z-index: 50;
-      margin-top: var(--page-inset);
+      margin-top: calc(var(--page-inset) + var(--page-inset));
       margin-right: calc(var(--page-inset) + var(--page-inset));
       margin-left: calc(var(--page-inset) + var(--page-inset));
-      margin-bottom: calc(-1 * (var(--page-inset) + var(--head-h)));
+      margin-bottom: calc(-1 * (var(--page-inset) + var(--page-inset) + var(--head-h)));
       display: flex;
       align-items: center;
       justify-content: space-between;
