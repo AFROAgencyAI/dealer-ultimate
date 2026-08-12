@@ -16,9 +16,23 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Dealer Ultimate</title>
   <link rel="icon" href="https://cdn.jsdelivr.net/gh/AFROAgencyAI/dealer-ultimate@main/media/favicon.svg" type="image/svg+xml" />
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <!-- LCP: hero photo (top half). Browser picks width from imagesrcset. -->
+  <link rel="preload" as="image" type="image/webp" fetchpriority="high"
+    href="https://cdn.jsdelivr.net/gh/AFROAgencyAI/dealer-ultimate@main/media/du-hero-1-w960.webp"
+    imagesrcset="https://cdn.jsdelivr.net/gh/AFROAgencyAI/dealer-ultimate@main/media/du-hero-1-w640.webp 640w, https://cdn.jsdelivr.net/gh/AFROAgencyAI/dealer-ultimate@main/media/du-hero-1-w960.webp 960w, https://cdn.jsdelivr.net/gh/AFROAgencyAI/dealer-ultimate@main/media/du-hero-1-w1280.webp 1280w"
+    imagesizes="(min-width: 1024px) 42vw, 100vw" />
+  <link rel="preload" as="font" type="font/otf" href="https://cdn.jsdelivr.net/gh/AFROAgencyAI/dealer-ultimate@main/media/Gotham-Black.otf" crossorigin />
+  <!-- Inter is progressive; system-ui paints first so hero text is not blocked on fonts.googleapis -->
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="preload" as="style"
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" />
+  <link rel="stylesheet"
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
+    media="print" onload="this.media='all'" />
+  <noscript>
+    <link rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" />
+  </noscript>
   <style>
     /*
       Gotham Black is a separate face (PostScript: Gotham-Black). On the system
@@ -29,7 +43,7 @@
       font-family: "Gotham Black Wordmark";
       src:
         url("https://cdn.jsdelivr.net/gh/AFROAgencyAI/dealer-ultimate@main/media/Gotham-Black.otf") format("opentype"),
-        /* GHL / CDN fallback (same file in dealer-ultimate media/) */
+        /* GHL / CDN fallback (same file in dealer-ultimate https://cdn.jsdelivr.net/gh/AFROAgencyAI/dealer-ultimate@main/media/) */
         url("https://cdn.jsdelivr.net/gh/AFROAgencyAI/dealer-ultimate@main/media/Gotham-Black.otf") format("opentype"),
         local("Gotham-Black"),
         local("Gotham Black"),
@@ -37,6 +51,27 @@
       font-weight: 400;
       font-style: normal;
       font-display: swap;
+    }
+
+    /* Below-the-fold sections: skip layout/paint until near viewport */
+    .trust-section,
+    .stat-section,
+    .how-section,
+    .sol-section,
+    .t-section,
+    .lead-section,
+    .site-footer {
+      content-visibility: auto;
+      contain-intrinsic-size: auto 480px;
+    }
+
+    .hero-photo picture,
+    .how-tx-shot picture,
+    .sol-media picture,
+    .lead-media picture {
+      display: block;
+      width: 100%;
+      height: 100%;
     }
 
     :root {
@@ -50,8 +85,9 @@
       --radius: 8px;
       /* Photo matches buttons / select / header chrome */
       --hero-r: 8px;
-      --font: "Inter", system-ui, sans-serif;
-      --display: "Gotham", "Inter", system-ui, sans-serif;
+      /* system-ui first: first paint does not wait on Inter download */
+      --font: system-ui, -apple-system, "Segoe UI", Roboto, "Inter", sans-serif;
+      --display: "Gotham", system-ui, "Inter", sans-serif;
       --page-inset: 16px;
       /* Shared gutter: page edge → tile, and tile edge → floating header */
       --inner: clamp(16px, 3.5vw, 40px);
@@ -2334,16 +2370,33 @@
     };
     (function () {
       if (!window.DU_MEDIA_BASE) return;
+      function rewriteSrcset(val) {
+        if (!val) return val;
+        return val.replace(/(^|[,\s])media\//g, function (_, p) {
+          return p + window.DU_MEDIA_BASE;
+        });
+      }
       document.querySelectorAll("img[src]").forEach(function (img) {
         var s = img.getAttribute("src");
         if (!s || /^https?:\/\//i.test(s)) return;
-        if (s.indexOf("media/") !== 0) return;
+        if (s.indexOf("https://cdn.jsdelivr.net/gh/AFROAgencyAI/dealer-ultimate@main/media/") !== 0) return;
         img.src = window.duMediaUrl(s);
+      });
+      document.querySelectorAll("img[srcset], source[srcset]").forEach(function (el) {
+        var s = el.getAttribute("srcset");
+        if (!s || s.indexOf("https://cdn.jsdelivr.net/gh/AFROAgencyAI/dealer-ultimate@main/media/") === -1) return;
+        el.setAttribute("srcset", rewriteSrcset(s));
+      });
+      document.querySelectorAll('link[rel="preload"][as="image"]').forEach(function (el) {
+        var h = el.getAttribute("href");
+        if (h && h.indexOf("https://cdn.jsdelivr.net/gh/AFROAgencyAI/dealer-ultimate@main/media/") === 0) el.href = window.duMediaUrl(h);
+        var is = el.getAttribute("imagesrcset");
+        if (is && is.indexOf("https://cdn.jsdelivr.net/gh/AFROAgencyAI/dealer-ultimate@main/media/") !== -1) el.setAttribute("imagesrcset", rewriteSrcset(is));
       });
       var icon = document.querySelector('link[rel="icon"][href]');
       if (icon) {
         var h = icon.getAttribute("href");
-        if (h && h.indexOf("media/") === 0) icon.href = window.duMediaUrl(h);
+        if (h && h.indexOf("https://cdn.jsdelivr.net/gh/AFROAgencyAI/dealer-ultimate@main/media/") === 0) icon.href = window.duMediaUrl(h);
       }
     })();
   </script>
@@ -2351,7 +2404,8 @@
   <div class="du-ghl-root">
   <header class="fake-head" id="siteHeader">
     <div class="logo">
-      <img src="https://cdn.jsdelivr.net/gh/AFROAgencyAI/dealer-ultimate@main/media/du-logo-mark.png" alt="" width="34" height="34" />
+      <img src="https://cdn.jsdelivr.net/gh/AFROAgencyAI/dealer-ultimate@main/media/du-logo-mark-68.png" srcset="https://cdn.jsdelivr.net/gh/AFROAgencyAI/dealer-ultimate@main/media/du-logo-mark-68.png 68w, https://cdn.jsdelivr.net/gh/AFROAgencyAI/dealer-ultimate@main/media/du-logo-mark-102.png 102w"
+        sizes="34px" alt="" width="34" height="34" decoding="async" fetchpriority="high" />
       <span class="logo-wordmark" role="img" aria-label="Dealer Ultimate">
         <span aria-hidden="true">DEALER</span>
         <span aria-hidden="true">ULTIMATE</span>
@@ -2429,8 +2483,16 @@
           </div>
         </div>
         <div class="hero-photo">
-          <img src="https://cdn.jsdelivr.net/gh/AFROAgencyAI/dealer-ultimate@main/media/du-hero-1.png" alt="Two men shaking hands on an RV dealership lot" width="1448"
-            height="1086" />
+          <picture>
+            <source type="image/webp"
+              srcset="https://cdn.jsdelivr.net/gh/AFROAgencyAI/dealer-ultimate@main/media/du-hero-1-w640.webp 640w, https://cdn.jsdelivr.net/gh/AFROAgencyAI/dealer-ultimate@main/media/du-hero-1-w960.webp 960w, https://cdn.jsdelivr.net/gh/AFROAgencyAI/dealer-ultimate@main/media/du-hero-1-w1280.webp 1280w"
+              sizes="(min-width: 1024px) 42vw, 100vw" />
+            <img src="https://cdn.jsdelivr.net/gh/AFROAgencyAI/dealer-ultimate@main/media/du-hero-1-w960.jpg"
+              srcset="https://cdn.jsdelivr.net/gh/AFROAgencyAI/dealer-ultimate@main/media/du-hero-1-w640.jpg 640w, https://cdn.jsdelivr.net/gh/AFROAgencyAI/dealer-ultimate@main/media/du-hero-1-w960.jpg 960w, https://cdn.jsdelivr.net/gh/AFROAgencyAI/dealer-ultimate@main/media/du-hero-1-w1280.jpg 1280w"
+              sizes="(min-width: 1024px) 42vw, 100vw"
+              alt="Two men shaking hands on an RV dealership lot" width="960" height="720"
+              fetchpriority="high" decoding="async" />
+          </picture>
         </div>
       </div>
     </section>
@@ -2441,34 +2503,34 @@
     <div class="trust-bar">
       <div class="trust-track">
         <div class="trust-group">
-          <img src="https://cdn.jsdelivr.net/gh/AFROAgencyAI/dealer-ultimate@main/media/trust-Group-62200.png" alt="" height="32" />
-          <img src="https://cdn.jsdelivr.net/gh/AFROAgencyAI/dealer-ultimate@main/media/trust-Group-62316.png" alt="" height="32" />
-          <img src="https://cdn.jsdelivr.net/gh/AFROAgencyAI/dealer-ultimate@main/media/trust-Group-62797.png" alt="" height="32" />
-          <img src="https://cdn.jsdelivr.net/gh/AFROAgencyAI/dealer-ultimate@main/media/trust-Group-62866.png" alt="" height="32" />
-          <img src="https://cdn.jsdelivr.net/gh/AFROAgencyAI/dealer-ultimate@main/media/trust-Group-62867.png" alt="" height="32" />
-          <img src="https://cdn.jsdelivr.net/gh/AFROAgencyAI/dealer-ultimate@main/media/trust-Group-62868.png" alt="" height="32" />
-          <img src="https://cdn.jsdelivr.net/gh/AFROAgencyAI/dealer-ultimate@main/media/trust-Group-62869.png" alt="" height="32" />
-          <img src="https://cdn.jsdelivr.net/gh/AFROAgencyAI/dealer-ultimate@main/media/trust-Group-62889.png" alt="" height="32" />
-          <img src="https://cdn.jsdelivr.net/gh/AFROAgencyAI/dealer-ultimate@main/media/trust-Group-62882.png" alt="" height="32" />
-          <img src="https://cdn.jsdelivr.net/gh/AFROAgencyAI/dealer-ultimate@main/media/trust-Group-62883.png" alt="" height="32" />
-          <img src="https://cdn.jsdelivr.net/gh/AFROAgencyAI/dealer-ultimate@main/media/trust-Group-62884.png" alt="" height="32" />
-          <img src="https://cdn.jsdelivr.net/gh/AFROAgencyAI/dealer-ultimate@main/media/trust-Group-62885.png" alt="" height="32" />
-          <img src="https://cdn.jsdelivr.net/gh/AFROAgencyAI/dealer-ultimate@main/media/trust-Group-62886.png" alt="" height="32" />
+          <img src="https://cdn.jsdelivr.net/gh/AFROAgencyAI/dealer-ultimate@main/media/trust-Group-62200.png" alt="" height="32" width="80" decoding="async" />
+          <img src="https://cdn.jsdelivr.net/gh/AFROAgencyAI/dealer-ultimate@main/media/trust-Group-62316.png" alt="" height="32" width="80" decoding="async" />
+          <img src="https://cdn.jsdelivr.net/gh/AFROAgencyAI/dealer-ultimate@main/media/trust-Group-62797.png" alt="" height="32" width="80" decoding="async" />
+          <img src="https://cdn.jsdelivr.net/gh/AFROAgencyAI/dealer-ultimate@main/media/trust-Group-62866.png" alt="" height="32" width="80" decoding="async" />
+          <img src="https://cdn.jsdelivr.net/gh/AFROAgencyAI/dealer-ultimate@main/media/trust-Group-62867.png" alt="" height="32" width="80" decoding="async" />
+          <img src="https://cdn.jsdelivr.net/gh/AFROAgencyAI/dealer-ultimate@main/media/trust-Group-62868.png" alt="" height="32" width="80" decoding="async" />
+          <img src="https://cdn.jsdelivr.net/gh/AFROAgencyAI/dealer-ultimate@main/media/trust-Group-62869.png" alt="" height="32" width="80" decoding="async" />
+          <img src="https://cdn.jsdelivr.net/gh/AFROAgencyAI/dealer-ultimate@main/media/trust-Group-62889.png" alt="" height="32" width="80" decoding="async" />
+          <img src="https://cdn.jsdelivr.net/gh/AFROAgencyAI/dealer-ultimate@main/media/trust-Group-62882.png" alt="" height="32" width="80" decoding="async" />
+          <img src="https://cdn.jsdelivr.net/gh/AFROAgencyAI/dealer-ultimate@main/media/trust-Group-62883.png" alt="" height="32" width="80" decoding="async" />
+          <img src="https://cdn.jsdelivr.net/gh/AFROAgencyAI/dealer-ultimate@main/media/trust-Group-62884.png" alt="" height="32" width="80" decoding="async" />
+          <img src="https://cdn.jsdelivr.net/gh/AFROAgencyAI/dealer-ultimate@main/media/trust-Group-62885.png" alt="" height="32" width="80" decoding="async" />
+          <img src="https://cdn.jsdelivr.net/gh/AFROAgencyAI/dealer-ultimate@main/media/trust-Group-62886.png" alt="" height="32" width="80" decoding="async" />
         </div>
         <div class="trust-group" aria-hidden="true">
-          <img src="https://cdn.jsdelivr.net/gh/AFROAgencyAI/dealer-ultimate@main/media/trust-Group-62200.png" alt="" height="32" />
-          <img src="https://cdn.jsdelivr.net/gh/AFROAgencyAI/dealer-ultimate@main/media/trust-Group-62316.png" alt="" height="32" />
-          <img src="https://cdn.jsdelivr.net/gh/AFROAgencyAI/dealer-ultimate@main/media/trust-Group-62797.png" alt="" height="32" />
-          <img src="https://cdn.jsdelivr.net/gh/AFROAgencyAI/dealer-ultimate@main/media/trust-Group-62866.png" alt="" height="32" />
-          <img src="https://cdn.jsdelivr.net/gh/AFROAgencyAI/dealer-ultimate@main/media/trust-Group-62867.png" alt="" height="32" />
-          <img src="https://cdn.jsdelivr.net/gh/AFROAgencyAI/dealer-ultimate@main/media/trust-Group-62868.png" alt="" height="32" />
-          <img src="https://cdn.jsdelivr.net/gh/AFROAgencyAI/dealer-ultimate@main/media/trust-Group-62869.png" alt="" height="32" />
-          <img src="https://cdn.jsdelivr.net/gh/AFROAgencyAI/dealer-ultimate@main/media/trust-Group-62889.png" alt="" height="32" />
-          <img src="https://cdn.jsdelivr.net/gh/AFROAgencyAI/dealer-ultimate@main/media/trust-Group-62882.png" alt="" height="32" />
-          <img src="https://cdn.jsdelivr.net/gh/AFROAgencyAI/dealer-ultimate@main/media/trust-Group-62883.png" alt="" height="32" />
-          <img src="https://cdn.jsdelivr.net/gh/AFROAgencyAI/dealer-ultimate@main/media/trust-Group-62884.png" alt="" height="32" />
-          <img src="https://cdn.jsdelivr.net/gh/AFROAgencyAI/dealer-ultimate@main/media/trust-Group-62885.png" alt="" height="32" />
-          <img src="https://cdn.jsdelivr.net/gh/AFROAgencyAI/dealer-ultimate@main/media/trust-Group-62886.png" alt="" height="32" />
+          <img src="https://cdn.jsdelivr.net/gh/AFROAgencyAI/dealer-ultimate@main/media/trust-Group-62200.png" alt="" height="32" width="80" loading="lazy" decoding="async" />
+          <img src="https://cdn.jsdelivr.net/gh/AFROAgencyAI/dealer-ultimate@main/media/trust-Group-62316.png" alt="" height="32" width="80" loading="lazy" decoding="async" />
+          <img src="https://cdn.jsdelivr.net/gh/AFROAgencyAI/dealer-ultimate@main/media/trust-Group-62797.png" alt="" height="32" width="80" loading="lazy" decoding="async" />
+          <img src="https://cdn.jsdelivr.net/gh/AFROAgencyAI/dealer-ultimate@main/media/trust-Group-62866.png" alt="" height="32" width="80" loading="lazy" decoding="async" />
+          <img src="https://cdn.jsdelivr.net/gh/AFROAgencyAI/dealer-ultimate@main/media/trust-Group-62867.png" alt="" height="32" width="80" loading="lazy" decoding="async" />
+          <img src="https://cdn.jsdelivr.net/gh/AFROAgencyAI/dealer-ultimate@main/media/trust-Group-62868.png" alt="" height="32" width="80" loading="lazy" decoding="async" />
+          <img src="https://cdn.jsdelivr.net/gh/AFROAgencyAI/dealer-ultimate@main/media/trust-Group-62869.png" alt="" height="32" width="80" loading="lazy" decoding="async" />
+          <img src="https://cdn.jsdelivr.net/gh/AFROAgencyAI/dealer-ultimate@main/media/trust-Group-62889.png" alt="" height="32" width="80" loading="lazy" decoding="async" />
+          <img src="https://cdn.jsdelivr.net/gh/AFROAgencyAI/dealer-ultimate@main/media/trust-Group-62882.png" alt="" height="32" width="80" loading="lazy" decoding="async" />
+          <img src="https://cdn.jsdelivr.net/gh/AFROAgencyAI/dealer-ultimate@main/media/trust-Group-62883.png" alt="" height="32" width="80" loading="lazy" decoding="async" />
+          <img src="https://cdn.jsdelivr.net/gh/AFROAgencyAI/dealer-ultimate@main/media/trust-Group-62884.png" alt="" height="32" width="80" loading="lazy" decoding="async" />
+          <img src="https://cdn.jsdelivr.net/gh/AFROAgencyAI/dealer-ultimate@main/media/trust-Group-62885.png" alt="" height="32" width="80" loading="lazy" decoding="async" />
+          <img src="https://cdn.jsdelivr.net/gh/AFROAgencyAI/dealer-ultimate@main/media/trust-Group-62886.png" alt="" height="32" width="80" loading="lazy" decoding="async" />
         </div>
       </div>
     </div>
@@ -2594,14 +2656,23 @@
       <!-- Shared image outside accordion — mobile above list, desktop left -->
       <div class="how-tx-media" aria-hidden="true">
         <div class="how-tx-shot is-active" data-how="buyers">
-          <img src="https://cdn.jsdelivr.net/gh/AFROAgencyAI/dealer-ultimate@main/media/du-more-buyers-1.png" alt="" width="1448" height="1086" />
+          <picture>
+            <source type="image/webp" srcset="https://cdn.jsdelivr.net/gh/AFROAgencyAI/dealer-ultimate@main/media/du-more-buyers-1-w640.webp 640w, https://cdn.jsdelivr.net/gh/AFROAgencyAI/dealer-ultimate@main/media/du-more-buyers-1-w960.webp 960w, https://cdn.jsdelivr.net/gh/AFROAgencyAI/dealer-ultimate@main/media/du-more-buyers-1-w1280.webp 1280w" sizes="(min-width: 900px) 42vw, 100vw" />
+            <img src="https://cdn.jsdelivr.net/gh/AFROAgencyAI/dealer-ultimate@main/media/du-more-buyers-1-w960.jpg" srcset="https://cdn.jsdelivr.net/gh/AFROAgencyAI/dealer-ultimate@main/media/du-more-buyers-1-w640.jpg 640w, https://cdn.jsdelivr.net/gh/AFROAgencyAI/dealer-ultimate@main/media/du-more-buyers-1-w960.jpg 960w, https://cdn.jsdelivr.net/gh/AFROAgencyAI/dealer-ultimate@main/media/du-more-buyers-1-w1280.jpg 1280w" sizes="(min-width: 900px) 42vw, 100vw" alt="" width="960" height="720" decoding="async" loading="lazy" />
+          </picture>
         </div>
         <div class="how-tx-shot" data-how="inventory">
-          <img src="https://cdn.jsdelivr.net/gh/AFROAgencyAI/dealer-ultimate@main/media/du-more-inventory-1.png" alt="" width="1448" height="1086" />
+          <picture>
+            <source type="image/webp" srcset="https://cdn.jsdelivr.net/gh/AFROAgencyAI/dealer-ultimate@main/media/du-more-inventory-1-w640.webp 640w, https://cdn.jsdelivr.net/gh/AFROAgencyAI/dealer-ultimate@main/media/du-more-inventory-1-w960.webp 960w, https://cdn.jsdelivr.net/gh/AFROAgencyAI/dealer-ultimate@main/media/du-more-inventory-1-w1280.webp 1280w" sizes="(min-width: 900px) 42vw, 100vw" />
+            <img src="https://cdn.jsdelivr.net/gh/AFROAgencyAI/dealer-ultimate@main/media/du-more-inventory-1-w960.jpg" srcset="https://cdn.jsdelivr.net/gh/AFROAgencyAI/dealer-ultimate@main/media/du-more-inventory-1-w640.jpg 640w, https://cdn.jsdelivr.net/gh/AFROAgencyAI/dealer-ultimate@main/media/du-more-inventory-1-w960.jpg 960w, https://cdn.jsdelivr.net/gh/AFROAgencyAI/dealer-ultimate@main/media/du-more-inventory-1-w1280.jpg 1280w" sizes="(min-width: 900px) 42vw, 100vw" alt="" width="960" height="720" decoding="async" loading="lazy" />
+          </picture>
         </div>
         <div class="how-tx-shot" data-how="sales">
-          <!-- No separate more-sales master in du-images; reuse hero close until one lands -->
-          <img src="https://cdn.jsdelivr.net/gh/AFROAgencyAI/dealer-ultimate@main/media/du-hero-1.png" alt="" width="1448" height="1086" />
+          <!-- Reuse hero crop until more-sales master lands -->
+          <picture>
+            <source type="image/webp" srcset="https://cdn.jsdelivr.net/gh/AFROAgencyAI/dealer-ultimate@main/media/du-hero-1-w640.webp 640w, https://cdn.jsdelivr.net/gh/AFROAgencyAI/dealer-ultimate@main/media/du-hero-1-w960.webp 960w, https://cdn.jsdelivr.net/gh/AFROAgencyAI/dealer-ultimate@main/media/du-hero-1-w1280.webp 1280w" sizes="(min-width: 900px) 42vw, 100vw" />
+            <img src="https://cdn.jsdelivr.net/gh/AFROAgencyAI/dealer-ultimate@main/media/du-hero-1-w960.jpg" srcset="https://cdn.jsdelivr.net/gh/AFROAgencyAI/dealer-ultimate@main/media/du-hero-1-w640.jpg 640w, https://cdn.jsdelivr.net/gh/AFROAgencyAI/dealer-ultimate@main/media/du-hero-1-w960.jpg 960w, https://cdn.jsdelivr.net/gh/AFROAgencyAI/dealer-ultimate@main/media/du-hero-1-w1280.jpg 1280w" sizes="(min-width: 900px) 42vw, 100vw" alt="" width="960" height="720" decoding="async" loading="lazy" />
+          </picture>
         </div>
       </div>
 
@@ -2661,7 +2732,10 @@
     <div class="sol-grid">
       <article class="sol-card">
         <div class="sol-media" aria-hidden="true">
-          <img src="https://cdn.jsdelivr.net/gh/AFROAgencyAI/dealer-ultimate@main/media/du-service-1.png" alt="" width="1448" height="1086" />
+          <picture>
+            <source type="image/webp" srcset="https://cdn.jsdelivr.net/gh/AFROAgencyAI/dealer-ultimate@main/media/du-service-1-w640.webp 640w, https://cdn.jsdelivr.net/gh/AFROAgencyAI/dealer-ultimate@main/media/du-service-1-w960.webp 960w, https://cdn.jsdelivr.net/gh/AFROAgencyAI/dealer-ultimate@main/media/du-service-1-w1280.webp 1280w" sizes="(min-width: 900px) 30vw, 100vw" />
+            <img src="https://cdn.jsdelivr.net/gh/AFROAgencyAI/dealer-ultimate@main/media/du-service-1-w960.jpg" srcset="https://cdn.jsdelivr.net/gh/AFROAgencyAI/dealer-ultimate@main/media/du-service-1-w640.jpg 640w, https://cdn.jsdelivr.net/gh/AFROAgencyAI/dealer-ultimate@main/media/du-service-1-w960.jpg 960w, https://cdn.jsdelivr.net/gh/AFROAgencyAI/dealer-ultimate@main/media/du-service-1-w1280.jpg 1280w" sizes="(min-width: 900px) 30vw, 100vw" alt="" width="960" height="720" decoding="async" loading="lazy" />
+          </picture>
           <span class="sol-wash"></span>
         </div>
         <div class="sol-body">
@@ -2672,7 +2746,10 @@
       </article>
       <article class="sol-card">
         <div class="sol-media" aria-hidden="true">
-          <img src="https://cdn.jsdelivr.net/gh/AFROAgencyAI/dealer-ultimate@main/media/du-service-2.png" alt="" width="1448" height="1086" />
+          <picture>
+            <source type="image/webp" srcset="https://cdn.jsdelivr.net/gh/AFROAgencyAI/dealer-ultimate@main/media/du-service-2-w640.webp 640w, https://cdn.jsdelivr.net/gh/AFROAgencyAI/dealer-ultimate@main/media/du-service-2-w960.webp 960w, https://cdn.jsdelivr.net/gh/AFROAgencyAI/dealer-ultimate@main/media/du-service-2-w1280.webp 1280w" sizes="(min-width: 900px) 30vw, 100vw" />
+            <img src="https://cdn.jsdelivr.net/gh/AFROAgencyAI/dealer-ultimate@main/media/du-service-2-w960.jpg" srcset="https://cdn.jsdelivr.net/gh/AFROAgencyAI/dealer-ultimate@main/media/du-service-2-w640.jpg 640w, https://cdn.jsdelivr.net/gh/AFROAgencyAI/dealer-ultimate@main/media/du-service-2-w960.jpg 960w, https://cdn.jsdelivr.net/gh/AFROAgencyAI/dealer-ultimate@main/media/du-service-2-w1280.jpg 1280w" sizes="(min-width: 900px) 30vw, 100vw" alt="" width="960" height="720" decoding="async" loading="lazy" />
+          </picture>
           <span class="sol-wash"></span>
         </div>
         <div class="sol-body">
@@ -2683,7 +2760,10 @@
       </article>
       <article class="sol-card">
         <div class="sol-media" aria-hidden="true">
-          <img src="https://cdn.jsdelivr.net/gh/AFROAgencyAI/dealer-ultimate@main/media/du-service-3.png" alt="" width="1448" height="1086" />
+          <picture>
+            <source type="image/webp" srcset="https://cdn.jsdelivr.net/gh/AFROAgencyAI/dealer-ultimate@main/media/du-service-3-w640.webp 640w, https://cdn.jsdelivr.net/gh/AFROAgencyAI/dealer-ultimate@main/media/du-service-3-w960.webp 960w, https://cdn.jsdelivr.net/gh/AFROAgencyAI/dealer-ultimate@main/media/du-service-3-w1280.webp 1280w" sizes="(min-width: 900px) 30vw, 100vw" />
+            <img src="https://cdn.jsdelivr.net/gh/AFROAgencyAI/dealer-ultimate@main/media/du-service-3-w960.jpg" srcset="https://cdn.jsdelivr.net/gh/AFROAgencyAI/dealer-ultimate@main/media/du-service-3-w640.jpg 640w, https://cdn.jsdelivr.net/gh/AFROAgencyAI/dealer-ultimate@main/media/du-service-3-w960.jpg 960w, https://cdn.jsdelivr.net/gh/AFROAgencyAI/dealer-ultimate@main/media/du-service-3-w1280.jpg 1280w" sizes="(min-width: 900px) 30vw, 100vw" alt="" width="960" height="720" decoding="async" loading="lazy" />
+          </picture>
           <span class="sol-wash"></span>
         </div>
         <div class="sol-body">
@@ -2722,7 +2802,7 @@
 
         <div class="t-video-wrap" id="tVideo">
           <button type="button" class="t-video-btn" id="tVideoBtn" aria-label="Watch the video">
-            <img id="tVideoImg" src="https://cdn.jsdelivr.net/gh/AFROAgencyAI/dealer-ultimate@main/media/testimonial-emily-video.png" alt="" width="491" height="295" />
+            <img id="tVideoImg" src="https://cdn.jsdelivr.net/gh/AFROAgencyAI/dealer-ultimate@main/media/testimonial-emily-video.webp" loading="lazy" decoding="async" alt="" width="491" height="295" />
             <span class="t-video-shade" aria-hidden="true"></span>
             <span class="t-play" aria-hidden="true">
               <svg viewBox="0 0 20 20" aria-hidden="true">
@@ -2782,8 +2862,10 @@
   <section class="lead-section" id="demo" aria-label="Get a demo">
     <div class="lead-layout">
       <figure class="lead-media">
-        <img src="https://cdn.jsdelivr.net/gh/AFROAgencyAI/dealer-ultimate@main/media/du-contact-1.png" alt="Dealership principal and salesperson walking the RV lot at sunset" width="1448"
-          height="1086" />
+        <picture>
+            <source type="image/webp" srcset="https://cdn.jsdelivr.net/gh/AFROAgencyAI/dealer-ultimate@main/media/du-contact-1-w640.webp 640w, https://cdn.jsdelivr.net/gh/AFROAgencyAI/dealer-ultimate@main/media/du-contact-1-w960.webp 960w, https://cdn.jsdelivr.net/gh/AFROAgencyAI/dealer-ultimate@main/media/du-contact-1-w1280.webp 1280w" sizes="(min-width: 900px) 42vw, 100vw" />
+            <img src="https://cdn.jsdelivr.net/gh/AFROAgencyAI/dealer-ultimate@main/media/du-contact-1-w960.jpg" srcset="https://cdn.jsdelivr.net/gh/AFROAgencyAI/dealer-ultimate@main/media/du-contact-1-w640.jpg 640w, https://cdn.jsdelivr.net/gh/AFROAgencyAI/dealer-ultimate@main/media/du-contact-1-w960.jpg 960w, https://cdn.jsdelivr.net/gh/AFROAgencyAI/dealer-ultimate@main/media/du-contact-1-w1280.jpg 1280w" sizes="(min-width: 900px) 42vw, 100vw" alt="Dealership principal and salesperson walking the RV lot at sunset" width="960" height="720" decoding="async" loading="lazy" />
+          </picture>
       </figure>
 
       <div class="lead-card">
@@ -2823,7 +2905,7 @@
     <div class="site-footer-top">
       <div class="foot-brand-block">
         <div class="foot-brand">
-          <img src="https://cdn.jsdelivr.net/gh/AFROAgencyAI/dealer-ultimate@main/media/du-logo-mark.png" alt="" width="32" height="32" />
+          <img src="https://cdn.jsdelivr.net/gh/AFROAgencyAI/dealer-ultimate@main/media/du-logo-mark-68.png" alt="" width="32" height="32" loading="lazy" decoding="async" />
           Dealer Ultimate
         </div>
         <p class="foot-tag">Inventory and buyers on the lot for independent RV dealers.</p>
@@ -2927,7 +3009,7 @@
             name: "Emily Androsky",
             role: "Marketing Director, Berge Auto",
             avatar: "https://cdn.jsdelivr.net/gh/AFROAgencyAI/dealer-ultimate@main/media/testimonial-emily-avatar.png",
-            video: "https://cdn.jsdelivr.net/gh/AFROAgencyAI/dealer-ultimate@main/media/testimonial-emily-video.png",
+            video: "https://cdn.jsdelivr.net/gh/AFROAgencyAI/dealer-ultimate@main/media/testimonial-emily-video.webp",
             ytId: "KweozYqEcCw",
             quote:
               "Dealer Ultimate is helping us truly look at the customer from more facets than we even realized existed so the journey from beginning to end is something they feel happy with."
@@ -2936,7 +3018,7 @@
             name: "Joyce Balaoro",
             role: "Marketing Director, Findlay Auto",
             avatar: "https://cdn.jsdelivr.net/gh/AFROAgencyAI/dealer-ultimate@main/media/testimonial-joyce-avatar.png",
-            video: "https://cdn.jsdelivr.net/gh/AFROAgencyAI/dealer-ultimate@main/media/testimonial-joyce-video.png",
+            video: "https://cdn.jsdelivr.net/gh/AFROAgencyAI/dealer-ultimate@main/media/testimonial-joyce-video.webp",
             ytId: "fg6kyznckOs",
             quote:
               "Dealer Ultimate teed us up so well for success and that’s what I love about them. They really truly save our lives here at Findlay Chevrolet."
@@ -2945,7 +3027,7 @@
             name: "Alex Gauthier",
             role: "Director of Marketing, Heuberger Subaru",
             avatar: "https://cdn.jsdelivr.net/gh/AFROAgencyAI/dealer-ultimate@main/media/testimonial-alex-avatar.png",
-            video: "https://cdn.jsdelivr.net/gh/AFROAgencyAI/dealer-ultimate@main/media/testimonial-alex-video.png",
+            video: "https://cdn.jsdelivr.net/gh/AFROAgencyAI/dealer-ultimate@main/media/testimonial-alex-video.webp",
             ytId: "s6wOZmd5VV0",
             quote:
               "Having access to our own first-party data represents a completely new horizon for what’s possible."
@@ -2954,7 +3036,7 @@
             name: "Debbie Waines",
             role: "Advertising and Marketing Director, John Elway",
             avatar: "https://cdn.jsdelivr.net/gh/AFROAgencyAI/dealer-ultimate@main/media/testimonial-debbie-avatar.png",
-            video: "https://cdn.jsdelivr.net/gh/AFROAgencyAI/dealer-ultimate@main/media/testimonial-debbie-video.png",
+            video: "https://cdn.jsdelivr.net/gh/AFROAgencyAI/dealer-ultimate@main/media/testimonial-debbie-video.webp",
             ytId: "ibH9ugbeUXA",
             quote:
               "Dealer Ultimate is always looking for ways to reinvent themselves, to make our ability to contact our guests quicker and automated. You add AI to it and I don’t know how they will be stopped."
@@ -2963,7 +3045,7 @@
             name: "Colin Carrasquillo",
             role: "Digital Marketing Director, Nielson Automotive",
             avatar: "https://cdn.jsdelivr.net/gh/AFROAgencyAI/dealer-ultimate@main/media/testimonial-colin-avatar.png",
-            video: "https://cdn.jsdelivr.net/gh/AFROAgencyAI/dealer-ultimate@main/media/testimonial-colin-video.png",
+            video: "https://cdn.jsdelivr.net/gh/AFROAgencyAI/dealer-ultimate@main/media/testimonial-colin-video.webp",
             ytId: "jIfsuHNkD_0",
             quote:
               "If you want to talk about actionable CDPs, this is the one! Dealer Ultimate is the one who makes it actionable and can deliver on that."
@@ -3004,7 +3086,7 @@
           art.innerHTML =
             '<div class="t-avatar"><img src="' +
             p.avatar +
-            '" alt="" width="100" height="100" /></div>' +
+            '" alt="" width="100" height="100" loading="lazy" decoding="async" /></div>' +
             '<div class="t-meta">' +
             '<p class="t-name"><strong>' +
             p.name +
