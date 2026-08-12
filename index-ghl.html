@@ -1,0 +1,3336 @@
+<!DOCTYPE html>
+<!--
+  Dealer Ultimate — GHL paste version (CDN-wired)
+  -----------------------------------------------
+  Media is hosted on GitHub and served via jsDelivr:
+    https://cdn.jsdelivr.net/gh/AFROAgencyAI/dealer-ultimate@main/media/<file>
+
+  Repo: https://github.com/AFROAgencyAI/dealer-ultimate
+
+  In GHL: blank/custom page → paste this full HTML file.
+  Wire #leadForm to a GHL form/webhook when you go live.
+  Rebuild from monorepo demo.html then re-push media + this file.
+-->
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Dealer Ultimate</title>
+  <link rel="icon" href="https://cdn.jsdelivr.net/gh/AFROAgencyAI/dealer-ultimate@main/media/favicon.svg" type="image/svg+xml" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <style>
+    /* Gotham omitted for GHL paste — display falls back to Inter */
+    :root {
+      --ink: #1c1917;
+      --muted: #3f3f46;
+      --muted-soft: #78716c;
+      --copper: #c2410c;
+      --copper-deep: #9a3412;
+      --wash-top: #f3ebe3;
+      --wash-mid: #faf7f3;
+      --radius: 8px;
+      /* Photo matches buttons / select / header chrome */
+      --hero-r: 8px;
+      --font: "Inter", system-ui, sans-serif;
+      --display: "Inter", system-ui, sans-serif;
+      --page-inset: 16px;
+      /* Shared gutter: page edge → tile, and tile edge → floating header */
+      --inner: clamp(16px, 3.5vw, 40px);
+      --head-h: 56px;
+    }
+
+    *,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      html {
+        scroll-behavior: auto;
+      }
+    }
+
+    body {
+      font-family: var(--font);
+      color: var(--ink);
+      background: #e7e5e4;
+      -webkit-font-smoothing: antialiased;
+      line-height: 1.5;
+    }
+
+    /* Hash-scroll stop: sticky bar sits slightly over the section tile (depth) */
+    #how,
+    #select,
+    #solutions,
+    #trust,
+    #results,
+    #proof,
+    #demo {
+      /*
+        Bar bottom would be inset + head-h. Subtract overlap so chrome
+        rests on the white tile instead of floating fully above it.
+      */
+      scroll-margin-top: calc(var(--page-inset) + var(--head-h) - 28px);
+    }
+
+    img {
+      display: block;
+      max-width: 100%;
+    }
+
+    a {
+      color: inherit;
+      text-decoration: none;
+    }
+
+    button {
+      font: inherit;
+      cursor: pointer;
+      border: none;
+      background: none;
+    }
+
+    .variant {
+      margin: var(--page-inset);
+      max-width: none;
+      padding: 0;
+    }
+
+    /*
+      Copper chrome (from demo.html): flat fill + 1px graded border stroke
+      lit top-left. Extra drop shadow lifts the edge so the sheen reads.
+    */
+    .btn-primary {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.4rem;
+      padding: 0.8rem 1.35rem;
+      border-radius: var(--radius);
+      font-weight: 600;
+      font-size: 0.95rem;
+      color: #fafaf9;
+      position: relative;
+      border: 1px solid transparent;
+      background:
+        linear-gradient(var(--copper), var(--copper)) padding-box,
+        linear-gradient(135deg,
+          rgba(255, 255, 255, 0.7) 0%,
+          rgba(255, 255, 255, 0.14) 40%,
+          rgba(0, 0, 0, 0.14) 72%,
+          rgba(0, 0, 0, 0.32) 100%) border-box;
+      background-color: var(--copper);
+      background-origin: border-box;
+      background-clip: padding-box, border-box;
+      box-shadow:
+        0 1px 2px rgba(12, 10, 9, 0.2),
+        0 6px 14px rgba(12, 10, 9, 0.12),
+        0 10px 28px rgba(194, 65, 12, 0.28);
+      transition: filter 0.15s ease, transform 0.15s ease, box-shadow 0.15s ease;
+    }
+
+    .btn-primary:hover {
+      filter: brightness(1.06);
+      box-shadow:
+        0 2px 4px rgba(12, 10, 9, 0.18),
+        0 8px 18px rgba(12, 10, 9, 0.14),
+        0 14px 32px rgba(194, 65, 12, 0.32);
+    }
+
+    .btn-primary:active {
+      transform: scale(0.98);
+    }
+
+    .btn-primary--sm {
+      padding: 0.5rem 0.95rem;
+      font-size: 0.82rem;
+    }
+
+    .btn-ghost {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0.8rem 1.25rem;
+      border-radius: var(--radius);
+      font-weight: 600;
+      font-size: 0.95rem;
+      color: var(--ink);
+      background: #fff;
+      border: 1px solid rgba(28, 25, 23, 0.12);
+      box-shadow: 0 1px 2px rgba(12, 10, 9, 0.04);
+    }
+
+    .btn-ghost:hover {
+      border-color: rgba(194, 65, 12, 0.35);
+      color: var(--copper);
+    }
+
+    /* overflow visible so absolute dropdown can overlay without clipping */
+    .hero-a {
+      position: relative;
+      background: linear-gradient(180deg, var(--wash-top) 0%, var(--wash-mid) 45%, #fff 100%);
+      border-radius: var(--radius);
+      overflow: visible;
+      border: 1px solid rgba(28, 25, 23, 0.06);
+      /*
+        Floating header gutters use --page-inset only (same as screen → tile).
+        padding-top = into-tile gutter + bar + gutter under bar.
+      */
+      padding-top: calc(var(--page-inset) + var(--head-h) + var(--page-inset));
+      padding-bottom: clamp(2rem, 4vw, 2.75rem);
+    }
+
+    /*
+      Floating sticky header — sticks full page.
+      All gutters = --page-inset (narrow strip between screen edge and cream tile).
+      Start: page-inset (to tile) + page-inset (into tile) on top and sides.
+    */
+    .fake-head {
+      position: sticky;
+      top: var(--page-inset);
+      z-index: 50;
+      margin-top: calc(var(--page-inset) + var(--page-inset));
+      margin-right: calc(var(--page-inset) + var(--page-inset));
+      margin-left: calc(var(--page-inset) + var(--page-inset));
+      margin-bottom: calc(-1 * (var(--page-inset) + var(--page-inset) + var(--head-h)));
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+      padding: 0.55rem 0.9rem;
+      min-height: var(--head-h);
+      background: rgba(255, 255, 255, 0.94);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border-radius: var(--radius);
+      box-shadow: 0 4px 24px rgba(12, 10, 9, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.85);
+    }
+
+    .fake-head .logo {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      flex-shrink: 0;
+      min-width: 0;
+      /* Left cluster — leaves right side clear for hamburger + demo */
+      margin-right: auto;
+    }
+
+    .fake-head .logo img {
+      width: 34px;
+      height: 34px;
+      border-radius: var(--radius);
+      flex-shrink: 0;
+    }
+
+    .fake-head .logo-wordmark {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      justify-content: center;
+      line-height: 1.0;
+      /* Force the Black face (weight 400 of that family = Black cut) */
+      font-family: "Gotham Black Wordmark", "Gotham Black", "Gotham-Black", "Gotham";
+      font-weight: 400;
+      font-style: normal;
+      font-synthesis: none;
+      font-size: 0.9rem;
+      /* Tight tracking — wide tracking thins the mass of Black */
+      letter-spacing: 0.01em;
+      text-transform: uppercase;
+      color: var(--ink);
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .fake-head .logo-wordmark span {
+      display: block;
+    }
+
+    .fake-head .links {
+      display: none;
+      gap: 1.35rem;
+      font-size: 0.88rem;
+      font-weight: 500;
+      color: var(--muted-soft);
+    }
+
+    .fake-head .links a:hover {
+      color: var(--copper);
+    }
+
+    @media (min-width: 800px) {
+      .fake-head .links {
+        display: flex;
+      }
+    }
+
+    .fake-head .head-actions {
+      display: flex;
+      align-items: center;
+      gap: 0.45rem;
+      flex-shrink: 0;
+      position: relative;
+    }
+
+    /* Hamburger — mobile only, left of demo CTA */
+    .fake-head .nav-toggle {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 2.25rem;
+      height: 2.25rem;
+      border-radius: var(--radius);
+      border: 1px solid rgba(28, 25, 23, 0.1);
+      background: #fff;
+      color: var(--ink);
+      flex-shrink: 0;
+      transition: border-color 0.15s, background 0.15s;
+    }
+
+    .fake-head .nav-toggle:hover,
+    .fake-head .nav-toggle[aria-expanded="true"] {
+      border-color: rgba(194, 65, 12, 0.4);
+      color: var(--copper);
+    }
+
+    .fake-head .nav-toggle svg {
+      width: 1.1rem;
+      height: 1.1rem;
+      display: block;
+    }
+
+    @media (min-width: 800px) {
+      .fake-head .nav-toggle {
+        display: none;
+      }
+    }
+
+    /* Mobile nav panel (opens from hamburger) */
+    .mobile-nav {
+      display: none;
+      position: absolute;
+      top: calc(100% + 8px);
+      right: 0;
+      min-width: 12.5rem;
+      z-index: 60;
+      background: #fff;
+      border-radius: var(--radius);
+      border: 1px solid rgba(28, 25, 23, 0.08);
+      box-shadow: 0 12px 36px rgba(12, 10, 9, 0.14);
+      padding: 0.35rem 0;
+      overflow: hidden;
+    }
+
+    .mobile-nav.open {
+      display: block;
+    }
+
+    .mobile-nav a {
+      display: block;
+      padding: 0.75rem 1.1rem;
+      font-size: 0.92rem;
+      font-weight: 500;
+      color: var(--ink);
+      text-align: left;
+      transition: background 0.12s, color 0.12s;
+    }
+
+    .mobile-nav a:hover {
+      background: #fff7ed;
+      color: var(--copper-deep);
+    }
+
+    @media (min-width: 800px) {
+      .mobile-nav {
+        display: none !important;
+      }
+    }
+
+    .hero-stage {
+      position: relative;
+      /* No extra top margin — hero-a padding-top already = gutter under header */
+      margin: 0 var(--inner);
+      display: grid;
+      gap: 1.5rem;
+      align-items: start;
+    }
+
+    @media (min-width: 1024px) {
+      .hero-stage {
+        grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+        gap: clamp(1.5rem, 3vw, 2.5rem);
+        align-items: start;
+      }
+    }
+
+    .hero-text {
+      order: 2;
+      max-width: 40rem;
+      position: relative;
+      z-index: 2;
+    }
+
+    @media (min-width: 1024px) {
+      .hero-text {
+        order: 1;
+        max-width: none;
+      }
+    }
+
+    /*
+      Photo: mobile fixed 4:3.
+      Desktop: JS sets height to match text column, clamped between
+      16:9 (shortest) and 4:3 (tallest) so bottoms stay aligned and
+      padding under the stage stays constant.
+    */
+    .hero-photo {
+      order: 1;
+      border-radius: var(--hero-r);
+      overflow: hidden;
+      box-shadow: 0 14px 40px rgba(12, 10, 9, 0.12);
+      aspect-ratio: 4 / 3;
+      background: #d6d3d1;
+      min-height: 0;
+    }
+
+    @media (min-width: 1024px) {
+      .hero-photo {
+        order: 2;
+        aspect-ratio: auto;
+        width: 100%;
+        /* height set by syncHeroPhoto(); fallback mid crop */
+        height: auto;
+        min-height: 0;
+      }
+    }
+
+    .hero-photo img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: 50% 30%;
+    }
+
+    .hero-text h1 {
+      margin-top: 0;
+      font-family: var(--display);
+      font-weight: 700;
+      font-size: clamp(1.65rem, 3.2vw, 2.35rem);
+      line-height: 1.22;
+      letter-spacing: -0.03em;
+      color: var(--ink);
+      max-width: 18em;
+    }
+
+    .hero-text .sub {
+      margin-top: 1rem;
+      font-size: clamp(1.05rem, 1.45vw, 1.2rem);
+      line-height: 1.5;
+      font-weight: 500;
+      color: var(--muted);
+      max-width: 32ch;
+    }
+
+    .hero-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.65rem;
+      margin-top: 1.4rem;
+    }
+
+    /*
+      Affinitiv-style self-select — full width of text column (~half stage).
+      Menu is position:absolute so open state does not grow the hero.
+    */
+    .select-wrap {
+      margin-top: 1.5rem;
+      width: 100%;
+      position: relative;
+    }
+
+    /* No tile — label free-floats like the subhead; only the control has a field */
+    .select-box {
+      background: transparent;
+      border: none;
+      box-shadow: none;
+      border-radius: 0;
+      padding: 0;
+    }
+
+    .select-label {
+      font-size: clamp(1.05rem, 1.45vw, 1.2rem);
+      font-weight: 500;
+      line-height: 1.5;
+      color: var(--muted);
+      margin-bottom: 0.55rem;
+    }
+
+    .select-field {
+      position: relative;
+      width: 100%;
+    }
+
+    .select-trigger {
+      width: 100%;
+      text-align: left;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+      padding: 0.9rem 1.15rem;
+      /* Same 8px radius as CTAs — not a pill */
+      border-radius: var(--radius);
+      border: 1.5px solid rgba(28, 25, 23, 0.1);
+      font-weight: 500;
+      font-size: 0.98rem;
+      background: #fff;
+      color: var(--ink);
+      box-shadow: 0 2px 8px rgba(12, 10, 9, 0.06);
+      transition: border-color 0.15s, box-shadow 0.15s;
+    }
+
+    .select-trigger:hover,
+    .select-trigger[aria-expanded="true"] {
+      border-color: var(--copper);
+      box-shadow: 0 4px 16px rgba(12, 10, 9, 0.1);
+    }
+
+    /* Single right-chevron; spins 90° to become down (and back on close) */
+    .select-trigger .chev {
+      flex-shrink: 0;
+      width: 1.1rem;
+      height: 1.1rem;
+      color: var(--copper);
+      display: block;
+      transform: rotate(0deg);
+      transition: transform 0.22s ease;
+      transform-origin: 50% 50%;
+    }
+
+    .select-trigger .chev svg {
+      width: 100%;
+      height: 100%;
+      display: block;
+    }
+
+    .select-trigger[aria-expanded="true"] .chev {
+      transform: rotate(90deg);
+    }
+
+    /* Overlay panel — does not push hero height (Affinitiv pattern) */
+    .select-menu {
+      display: none;
+      position: absolute;
+      left: 0;
+      right: 0;
+      top: calc(100% + 6px);
+      z-index: 30;
+      border-radius: var(--radius);
+      border: 1px solid rgba(28, 25, 23, 0.08);
+      overflow: hidden;
+      background: #fff;
+      box-shadow: 0 12px 40px rgba(12, 10, 9, 0.14);
+      max-height: min(320px, 50vh);
+      overflow-y: auto;
+    }
+
+    .select-menu.open {
+      display: block;
+    }
+
+    .select-menu button {
+      width: 100%;
+      text-align: left;
+      padding: 0.85rem 1.15rem;
+      border-bottom: 1px solid rgba(28, 25, 23, 0.06);
+      font-size: 0.95rem;
+      font-weight: 500;
+      background: #fff;
+      color: var(--ink);
+      transition: background 0.12s, color 0.12s;
+    }
+
+    .select-menu button:last-child {
+      border-bottom: none;
+    }
+
+    .select-menu button:hover {
+      background: #fff7ed;
+      color: var(--copper-deep);
+    }
+
+    /*
+      Trust section — headline + continuous marquee on page bg (no tile).
+      Logos from Fullpath (demo stand-ins).
+    */
+    .trust-section {
+      width: 100%;
+      margin: 0;
+      /* Extra air under the marquee before stats */
+      padding: 2rem 0 4.25rem;
+      background: transparent;
+      text-align: center;
+    }
+
+    .trust-headline {
+      font-size: clamp(1.15rem, 1.7vw, 1.4rem);
+      font-weight: 700;
+      color: var(--ink);
+      letter-spacing: -0.02em;
+      /* Space above the logo marquee */
+      margin: 0 0 2.75rem;
+      padding: 0 var(--inner);
+    }
+
+    .trust-bar {
+      position: relative;
+      width: 100%;
+      margin: 0;
+      padding: 0;
+      background: transparent;
+      overflow: hidden;
+      -webkit-mask-image: linear-gradient(90deg,
+          transparent 0%,
+          #000 6%,
+          #000 94%,
+          transparent 100%);
+      mask-image: linear-gradient(90deg,
+          transparent 0%,
+          #000 6%,
+          #000 94%,
+          transparent 100%);
+    }
+
+    .trust-track {
+      display: flex;
+      width: max-content;
+      align-items: center;
+      /* Half previous speed (42s → 84s per loop) */
+      animation: trust-marquee 84s linear infinite;
+      will-change: transform;
+    }
+
+    .trust-group {
+      display: flex;
+      align-items: center;
+      gap: clamp(2.25rem, 4vw, 3.75rem);
+      padding-right: clamp(2.25rem, 4vw, 3.75rem);
+      flex-shrink: 0;
+    }
+
+    .trust-group img {
+      display: block;
+      height: clamp(22px, 2.4vw, 32px);
+      width: auto;
+      max-width: 160px;
+      object-fit: contain;
+      object-position: center;
+      opacity: 0.55;
+      filter: grayscale(1);
+      user-select: none;
+      pointer-events: none;
+    }
+
+    @keyframes trust-marquee {
+      from {
+        transform: translateX(0);
+      }
+
+      to {
+        transform: translateX(-50%);
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .trust-track {
+        animation: none;
+      }
+
+      .t-person,
+      .t-person .t-avatar,
+      .t-person .t-meta,
+      .t-person .t-name,
+      .t-person .t-stars,
+      .t-video-wrap img,
+      .t-quote-on-video,
+      .t-quote-mobile {
+        transition: none !important;
+      }
+    }
+
+    /*
+      Stats — Fullpath-style big numbers, DealerNerds proof.
+      Copper chrome cards (same graded border + shadow as CTAs).
+    */
+    .stats-section {
+      margin: 0 var(--page-inset) clamp(1.5rem, 3vw, 2.25rem);
+      padding: 0 var(--inner);
+    }
+
+    .stats-grid {
+      display: grid;
+      gap: 1rem;
+      grid-template-columns: 1fr;
+    }
+
+    @media (min-width: 640px) {
+      .stats-grid {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+      }
+    }
+
+    .stat-card {
+      position: relative;
+      overflow: hidden;
+      min-height: 12.5rem;
+      padding: 1.35rem 1.25rem 1.05rem;
+      display: flex;
+      flex-direction: column;
+      border-radius: var(--radius);
+      color: #fafaf9;
+      border: 1px solid transparent;
+      background:
+        linear-gradient(var(--copper), var(--copper)) padding-box,
+        linear-gradient(135deg,
+          rgba(255, 255, 255, 0.7) 0%,
+          rgba(255, 255, 255, 0.14) 40%,
+          rgba(0, 0, 0, 0.14) 72%,
+          rgba(0, 0, 0, 0.32) 100%) border-box;
+      background-color: var(--copper);
+      background-origin: border-box;
+      background-clip: padding-box, border-box;
+      box-shadow:
+        0 1px 2px rgba(12, 10, 9, 0.2),
+        0 6px 14px rgba(12, 10, 9, 0.12),
+        0 10px 28px rgba(194, 65, 12, 0.28);
+    }
+
+    /*
+      Graphic fills the whole card behind the figure, the way Fullpath does it.
+      preserveAspectRatio="xMidYMax slice" is the SVG equivalent of
+      object-fit: cover anchored to the bottom: it scales uniformly so the box
+      is always covered, pins the artwork to the bottom edge, and crops the
+      sides rather than distorting. That is what lets the card keep a dynamic
+      height without the artwork stretching.
+
+      Each graphic keeps its mass below the midline and away from the top left,
+      because that is where the figure sits. Anything drawn up there renders
+      behind the number and just muddies it.
+    */
+    .stat-card .stat-viz {
+      position: absolute;
+      inset: 0;
+      z-index: 0;
+      pointer-events: none;
+    }
+
+    .stat-card .stat-viz svg {
+      width: 100%;
+      height: 100%;
+      display: block;
+    }
+
+    .stat-card .stat-top {
+      position: relative;
+      z-index: 1;
+      min-width: 0;
+    }
+
+    .stat-card .stat-label {
+      font-size: 0.85rem;
+      font-weight: 500;
+      color: rgba(250, 250, 249, 0.82);
+      line-height: 1.35;
+    }
+
+    .stat-card .stat-num {
+      font-family: var(--display);
+      font-weight: 800;
+      font-size: clamp(2.35rem, 4vw, 3rem);
+      letter-spacing: -0.03em;
+      line-height: 1;
+      color: #fff;
+      text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+      margin-top: 0.7rem;
+    }
+
+
+    /*
+      Solutions — stat-card copper chrome border + photo + transparent orange wash.
+      Image full-bleed; wash fades so copy stays readable and the photo reads at
+      the bottom. Learn more uses header-size primary chrome (btn-primary--sm).
+    */
+    .sol-section {
+      margin: 0 var(--page-inset) var(--page-inset);
+      padding: clamp(2.25rem, 4.5vw, 3.25rem) var(--inner) clamp(2rem, 4vw, 2.75rem);
+      background: #fff;
+      border-radius: var(--radius);
+      border: 1px solid rgba(28, 25, 23, 0.06);
+    }
+
+    .sol-section h2 {
+      font-family: var(--display);
+      font-weight: 700;
+      font-size: clamp(1.55rem, 2.8vw, 2.1rem);
+      letter-spacing: -0.03em;
+      line-height: 1.12;
+      margin-bottom: clamp(1.25rem, 2.5vw, 1.75rem);
+    }
+
+    .sol-grid {
+      display: grid;
+      gap: 1rem;
+      grid-template-columns: 1fr;
+    }
+
+    @media (min-width: 900px) {
+      .sol-grid {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+      }
+    }
+
+    .sol-card {
+      position: relative;
+      overflow: hidden;
+      min-height: 17.5rem;
+      padding: 1.35rem 1.25rem 1.25rem;
+      display: flex;
+      flex-direction: column;
+      border-radius: var(--radius);
+      color: var(--ink);
+      /*
+        Copper chrome edge (same construction as .stat-card / .btn-primary).
+        Highlight is warm copper-lit, not pure white, so it still reads on the
+        light wash instead of looking like a flat white stroke.
+      */
+      border: 1px solid transparent;
+      background:
+        linear-gradient(rgba(194, 65, 12, 0.04), rgba(194, 65, 12, 0.04)) padding-box,
+        linear-gradient(135deg,
+          rgba(255, 236, 220, 0.95) 0%,
+          rgba(255, 200, 160, 0.45) 32%,
+          rgba(154, 52, 18, 0.28) 68%,
+          rgba(60, 20, 5, 0.42) 100%) border-box;
+      background-origin: border-box;
+      background-clip: padding-box, border-box;
+      box-shadow:
+        0 1px 2px rgba(12, 10, 9, 0.2),
+        0 6px 14px rgba(12, 10, 9, 0.12),
+        0 10px 28px rgba(194, 65, 12, 0.28);
+    }
+
+    .sol-card .sol-media {
+      position: absolute;
+      inset: 0;
+      z-index: 0;
+      pointer-events: none;
+    }
+
+    .sol-card .sol-media img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: center;
+      display: block;
+    }
+
+    /*
+      Brand copper wash (not white): denser at top so title/body stay readable,
+      eases to translucent copper so the photo still reads underneath.
+    */
+    .sol-card .sol-wash {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(
+        180deg,
+        rgba(243, 222, 208, 0.96) 0%,
+        rgba(232, 196, 172, 0.9) 22%,
+        rgba(214, 148, 110, 0.62) 48%,
+        rgba(194, 65, 12, 0.28) 72%,
+        rgba(154, 52, 18, 0.12) 100%
+      );
+    }
+
+    .sol-card .sol-body {
+      position: relative;
+      z-index: 1;
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+      min-height: 0;
+    }
+
+    .sol-card h3 {
+      font-family: var(--display);
+      font-weight: 800;
+      font-size: 1.3rem;
+      letter-spacing: -0.02em;
+      line-height: 1.1;
+      color: #1c1917;
+    }
+
+    .sol-card p {
+      margin-top: 0.55rem;
+      font-size: 0.95rem;
+      line-height: 1.45;
+      color: #3f2920;
+      max-width: 28ch;
+    }
+
+    /*
+      Learn more: re-assert full copper chrome sheen (same as header Get a Demo).
+      Explicit clip/origin so the graded border doesn’t collapse to a flat edge
+      over photo/wash parents.
+    */
+    .sol-card .sol-more.btn-primary {
+      margin-top: auto;
+      align-self: flex-start;
+      border: 1px solid transparent;
+      background:
+        linear-gradient(var(--copper), var(--copper)) padding-box,
+        linear-gradient(135deg,
+          rgba(255, 255, 255, 0.7) 0%,
+          rgba(255, 255, 255, 0.14) 40%,
+          rgba(0, 0, 0, 0.14) 72%,
+          rgba(0, 0, 0, 0.32) 100%) border-box;
+      background-color: var(--copper);
+      background-origin: border-box;
+      background-clip: padding-box, border-box;
+      box-shadow:
+        0 1px 2px rgba(12, 10, 9, 0.2),
+        0 6px 14px rgba(12, 10, 9, 0.12),
+        0 10px 28px rgba(194, 65, 12, 0.28);
+    }
+
+    .sol-card .sol-more.btn-primary:hover {
+      filter: brightness(1.06);
+      box-shadow:
+        0 2px 4px rgba(12, 10, 9, 0.18),
+        0 8px 18px rgba(12, 10, 9, 0.14),
+        0 14px 32px rgba(194, 65, 12, 0.32);
+    }
+
+    /* Three identical "Learn more" links need distinct accessible names (WCAG 2.4.4) */
+    .sr-only {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0 0 0 0);
+      white-space: nowrap;
+      border: 0;
+    }
+
+    /*
+      How it works — Pura pattern:
+      Shared dynamic image (left desktop / above list mobile).
+      Accordion tabs + text on the right. Fixed list height. Smooth expand.
+    */
+    .how-section {
+      /* Same top air as .t-section → “Real dealers, real results.” */
+      --how-space-above: clamp(2.25rem, 4.5vw, 3.25rem);
+      --how-space-below: 1.4rem;
+      --how-expand: 0.38s;
+      margin: 0 var(--page-inset) var(--page-inset);
+      padding: var(--how-space-above) var(--inner) clamp(2rem, 4vw, 2.75rem);
+      background: #fff;
+      border-radius: var(--radius);
+      border: 1px solid rgba(28, 25, 23, 0.06);
+    }
+
+    .how-section h2 {
+      font-family: var(--display);
+      font-weight: 700;
+      font-size: clamp(1.55rem, 2.8vw, 2.1rem);
+      letter-spacing: -0.03em;
+      line-height: 1.2;
+      color: var(--ink);
+      max-width: 18em;
+      margin: 0 0 var(--how-space-below);
+    }
+
+    .how-tx {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 1rem;
+      align-items: stretch;
+      overflow-anchor: none;
+    }
+
+    @media (min-width: 900px) {
+      .how-tx {
+        grid-template-columns: minmax(0, 1fr) minmax(0, 1.05fr);
+        gap: 1.35rem;
+      }
+    }
+
+    /*
+      Shared media — always outside accordion cards.
+      Mobile: fixed 4:3 above the list. Desktop: stretch to list height.
+    */
+    .how-tx-media {
+      display: block;
+      position: relative;
+      width: 100%;
+      aspect-ratio: 4 / 3;
+      border-radius: var(--radius);
+      overflow: hidden;
+      background: #e7e5e4;
+      box-shadow:
+        0 1px 2px rgba(12, 10, 9, 0.08),
+        0 14px 36px rgba(12, 10, 9, 0.1);
+    }
+
+    @media (min-width: 900px) {
+      .how-tx-media {
+        aspect-ratio: auto;
+        height: 100%;
+        min-height: 100%;
+        align-self: stretch;
+      }
+    }
+
+    .how-tx-shot {
+      position: absolute;
+      inset: 0;
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 0.35s ease, visibility 0.35s ease;
+    }
+
+    .how-tx-shot.is-active {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    .how-tx-shot img {
+      display: block;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: center 20%;
+    }
+
+    .how-tx-list {
+      display: flex;
+      flex-direction: column;
+      gap: 0.65rem;
+      /* JS locks fixed height via --how-list-min (tallest open state) */
+      height: var(--how-list-min, auto);
+      min-height: var(--how-list-min, auto);
+      overflow-anchor: none;
+    }
+
+    .how-tx-list .how-foot {
+      margin-top: auto;
+      padding-top: 1.15rem;
+    }
+
+    /* During measure: kill transitions so height is true open height */
+    .how-tx-list.is-measuring .how-body,
+    .how-tx-list.is-measuring .how-item {
+      transition: none !important;
+    }
+
+    .how-tx-list.is-measuring .how-item.is-open .how-body {
+      display: block;
+      grid-template-rows: none;
+    }
+
+    .how-tx-list.is-measuring .how-item:not(.is-open) .how-body {
+      display: none;
+    }
+
+    .how-item {
+      background: #fff;
+      border: 1px solid rgba(28, 25, 23, 0.08);
+      border-radius: var(--radius);
+      box-shadow: 0 1px 2px rgba(12, 10, 9, 0.04);
+      overflow: hidden;
+      overflow-anchor: none;
+      transition:
+        border-color var(--how-expand) ease,
+        box-shadow var(--how-expand) ease;
+    }
+
+    .how-item.is-open {
+      border-color: rgba(194, 65, 12, 0.28);
+      box-shadow:
+        0 1px 2px rgba(12, 10, 9, 0.06),
+        0 10px 28px rgba(194, 65, 12, 0.12);
+    }
+
+    .how-trigger {
+      width: 100%;
+      display: flex;
+      align-items: center;
+      gap: 0.7rem;
+      text-align: left;
+      padding: 1rem 1.15rem;
+      background: transparent;
+      color: var(--ink);
+      font-weight: 700;
+      font-size: clamp(1.08rem, 1.45vw, 1.22rem);
+      letter-spacing: -0.02em;
+      transition: background 0.15s;
+    }
+
+    .how-trigger:hover {
+      background: rgba(250, 247, 243, 0.8);
+    }
+
+    .how-trigger .step-num {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 1.85rem;
+      height: 1.85rem;
+      padding: 0 0.4rem;
+      border-radius: var(--radius);
+      background: var(--copper);
+      color: #fafaf9;
+      font-size: 0.78rem;
+      font-weight: 700;
+      letter-spacing: 0.02em;
+      flex-shrink: 0;
+      line-height: 1;
+    }
+
+    .how-trigger .how-tab-label {
+      line-height: 1.2;
+    }
+
+    /*
+      Smooth expand / collapse — same duration both ways.
+      grid 0fr → 1fr animates height without snap.
+    */
+    .how-body {
+      display: grid;
+      grid-template-rows: 0fr;
+      transition: grid-template-rows var(--how-expand) ease;
+    }
+
+    .how-item.is-open .how-body {
+      grid-template-rows: 1fr;
+    }
+
+    .how-body-inner {
+      overflow: hidden;
+      min-height: 0;
+    }
+
+    .how-body-inner>p {
+      margin: 0;
+      padding: 0 1.15rem 1.2rem;
+      font-size: 1rem;
+      font-weight: 500;
+      color: var(--muted);
+      line-height: 1.55;
+      max-width: 100%;
+    }
+
+    @media (min-width: 900px) {
+      .how-body-inner>p {
+        font-size: 1.05rem;
+        /* Use most of the accordion column; avoid aggressive ch wrap */
+        max-width: 80%;
+      }
+    }
+
+    .how-foot {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 0.85rem 1.25rem;
+    }
+
+    .how-foot .deal-line {
+      font-size: 1.05rem;
+      font-weight: 600;
+      color: var(--ink);
+      letter-spacing: -0.01em;
+    }
+
+    .deal-accent {
+      color: var(--copper);
+      font-weight: 700;
+    }
+
+    /*
+      Testimonials — Fullpath "Real dealers, real results".
+      Desktop: title full-width; body column ~70%; vertical people stack + video.
+      Mobile: centered title, horizontal people strip, Watch the Video, quote, nav.
+    */
+    .t-section {
+      margin: 0 var(--page-inset) var(--page-inset);
+      padding: clamp(2.25rem, 4.5vw, 3.25rem) var(--inner);
+      background: #fff;
+      border-radius: var(--radius);
+      border: 1px solid rgba(28, 25, 23, 0.06);
+    }
+
+    .t-head {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem 1.5rem;
+      margin-bottom: clamp(1.75rem, 3vw, 2.5rem);
+    }
+
+    .t-head h2 {
+      font-family: var(--display);
+      font-weight: 700;
+      font-size: clamp(1.65rem, 3vw, 2.35rem);
+      letter-spacing: -0.03em;
+      line-height: 1.15;
+      color: var(--ink);
+      margin: 0;
+    }
+
+    /* Desktop nav sits in title row; mobile nav is bottom-centered */
+    .t-nav {
+      display: none;
+      align-items: center;
+      gap: 0.65rem;
+    }
+
+    .t-nav--mobile {
+      display: flex;
+      justify-content: center;
+      margin-top: 1.75rem;
+    }
+
+    @media (min-width: 900px) {
+      .t-nav--desktop {
+        display: flex;
+      }
+
+      .t-nav--mobile {
+        display: none;
+      }
+    }
+
+    .t-arrow {
+      width: 2.75rem;
+      height: 2.75rem;
+      border-radius: 999px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      color: #fff;
+      /* Same copper chrome border sheen as .btn-primary / stat cards */
+      border: 1px solid transparent;
+      background:
+        linear-gradient(var(--copper), var(--copper)) padding-box,
+        linear-gradient(135deg,
+          rgba(255, 255, 255, 0.7) 0%,
+          rgba(255, 255, 255, 0.14) 40%,
+          rgba(0, 0, 0, 0.14) 72%,
+          rgba(0, 0, 0, 0.32) 100%) border-box;
+      background-color: var(--copper);
+      background-origin: border-box;
+      background-clip: padding-box, border-box;
+      box-shadow:
+        0 1px 2px rgba(12, 10, 9, 0.2),
+        0 6px 14px rgba(12, 10, 9, 0.12),
+        0 10px 28px rgba(194, 65, 12, 0.28);
+      transition: filter 0.15s ease, transform 0.15s ease, box-shadow 0.15s ease;
+    }
+
+    .t-arrow:hover {
+      filter: brightness(1.06);
+      box-shadow:
+        0 2px 4px rgba(12, 10, 9, 0.18),
+        0 8px 18px rgba(12, 10, 9, 0.14),
+        0 14px 32px rgba(194, 65, 12, 0.32);
+    }
+
+    .t-arrow:active {
+      transform: scale(0.96);
+    }
+
+    .t-arrow svg {
+      width: 1.1rem;
+      height: 1.1rem;
+      display: block;
+    }
+
+    .t-dots {
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      padding: 0 0.25rem;
+    }
+
+    .t-dot {
+      width: 0.5rem;
+      height: 0.5rem;
+      border-radius: 999px;
+      background: #d6d3d1;
+      transition: background 0.25s, transform 0.25s;
+    }
+
+    .t-dot.is-active {
+      background: var(--copper);
+      transform: scale(1.15);
+    }
+
+    /* Desktop: centered column at 90% of tile content width */
+    .t-body {
+      width: 100%;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    @media (min-width: 900px) {
+      .t-body {
+        width: 90%;
+        max-width: 90%;
+      }
+    }
+
+    .t-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 1.25rem;
+      align-items: center;
+    }
+
+    @media (min-width: 900px) {
+      .t-grid {
+        grid-template-columns: minmax(0, 0.95fr) minmax(0, 1.15fr);
+        /*
+          Was 80% body + gap G. Now 90% body; +10% of parent goes into gap
+          so column free space (and video size) stays the same as at 80%.
+          10% of parent ≈ 11.111% of this 90% body.
+        */
+        gap: calc(clamp(2rem, 4.5vw, 3.25rem) + 11.111%);
+      }
+    }
+
+    /* —— Desktop vertical stack —— */
+    .t-stack {
+      position: relative;
+      height: 22rem;
+      min-height: 22rem;
+    }
+
+    @media (min-width: 900px) {
+      .t-stack {
+        /* Clip far cards so only prev / active / next read in the column */
+        height: 26rem;
+        min-height: 26rem;
+        overflow: hidden;
+      }
+    }
+
+    /* Mobile: single-card horizontal slide (no stacked peeks) */
+    @media (max-width: 899px) {
+      .t-section {
+        overflow: hidden;
+      }
+
+      .t-stack {
+        height: 7.5rem;
+        min-height: 7.5rem;
+        overflow: hidden;
+        touch-action: pan-y;
+      }
+
+      .t-head {
+        justify-content: center;
+        text-align: center;
+        margin-bottom: 1.5rem;
+      }
+
+      .t-head h2 {
+        width: 100%;
+        text-align: center;
+      }
+    }
+
+    .t-person {
+      position: absolute;
+      left: 0;
+      right: 0;
+      display: flex;
+      align-items: center;
+      gap: 0.9rem;
+      /* top + transform only (never bottom) so motion can interpolate */
+      transition:
+        top 0.55s cubic-bezier(0.4, 0, 0.2, 1),
+        left 0.55s cubic-bezier(0.4, 0, 0.2, 1),
+        opacity 0.55s cubic-bezier(0.4, 0, 0.2, 1),
+        transform 0.55s cubic-bezier(0.4, 0, 0.2, 1);
+      will-change: top, left, opacity, transform;
+    }
+
+    .t-person .t-avatar {
+      flex-shrink: 0;
+      border-radius: 999px;
+      overflow: hidden;
+      background: #e7e5e4;
+      transition:
+        width 0.55s cubic-bezier(0.4, 0, 0.2, 1),
+        height 0.55s cubic-bezier(0.4, 0, 0.2, 1),
+        opacity 0.55s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .t-person .t-avatar img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    .t-person .t-meta {
+      min-width: 0;
+      /* Fullpath-like wrap width so name/role break mid-title */
+      max-width: 15.5rem;
+      transition:
+        opacity 0.55s cubic-bezier(0.4, 0, 0.2, 1),
+        max-width 0.55s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .t-person .t-name {
+      margin: 0;
+      font-weight: 500;
+      letter-spacing: -0.01em;
+      color: var(--ink);
+      line-height: 1.35;
+      transition:
+        font-size 0.55s cubic-bezier(0.4, 0, 0.2, 1),
+        color 0.55s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .t-person .t-name strong {
+      font-weight: 700;
+    }
+
+    .t-stars {
+      display: flex;
+      gap: 0.12rem;
+      margin-top: 0.35rem;
+      /* Fixed star glyphs; size via transform only (GPU, no stepped width/height) */
+      transform-origin: left center;
+      will-change: transform, opacity;
+      transition:
+        opacity 0.38s cubic-bezier(0.22, 1, 0.36, 1),
+        transform 0.38s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+
+    .t-stars svg {
+      width: 1rem;
+      height: 1rem;
+      display: block;
+      flex-shrink: 0;
+      fill: #eab308;
+      transition: fill 0.38s ease;
+    }
+
+    /* Desktop: vertical positions — Fullpath 3-slot (prev / active / next only) */
+    @media (min-width: 900px) {
+      .t-person {
+        align-items: flex-start;
+        gap: 1rem;
+      }
+
+      .t-person[data-pos="0"] {
+        top: 50%;
+        transform: translateY(-50%);
+        opacity: 1;
+        z-index: 3;
+      }
+
+      .t-person[data-pos="0"] .t-avatar {
+        width: 4.75rem;
+        height: 4.75rem;
+        opacity: 1;
+      }
+
+      .t-person[data-pos="0"] .t-meta {
+        max-width: 17rem;
+        padding-top: 0.15rem;
+      }
+
+      .t-person[data-pos="0"] .t-name {
+        font-size: 1.125rem;
+        font-weight: 500;
+        color: var(--ink);
+      }
+
+      .t-person[data-pos="0"] .t-name strong {
+        font-weight: 700;
+        color: var(--ink);
+      }
+
+      .t-person[data-pos="0"] .t-stars {
+        opacity: 1;
+        transform: scale(1.05);
+        margin-top: 0.45rem;
+      }
+
+      .t-person[data-pos="0"] .t-stars svg {
+        fill: #eab308;
+      }
+
+      /* Prev (above) + next (below): muted, smaller — Fullpath peeks */
+      .t-person[data-pos="-1"],
+      .t-person[data-pos="1"] {
+        opacity: 1;
+        z-index: 2;
+      }
+
+      /* top + transform only so rotate animates (no bottom: auto snaps) */
+      .t-person[data-pos="-1"] {
+        top: 4%;
+        transform: translateY(0);
+      }
+
+      .t-person[data-pos="1"] {
+        top: 96%;
+        transform: translateY(-100%);
+      }
+
+      .t-person[data-pos="-1"] .t-avatar,
+      .t-person[data-pos="1"] .t-avatar {
+        width: 3.25rem;
+        height: 3.25rem;
+        opacity: 0.92;
+      }
+
+      .t-person[data-pos="-1"] .t-meta,
+      .t-person[data-pos="1"] .t-meta {
+        max-width: 15.5rem;
+        padding-top: 0.1rem;
+      }
+
+      .t-person[data-pos="-1"] .t-name,
+      .t-person[data-pos="1"] .t-name {
+        font-size: 0.9375rem;
+        font-weight: 500;
+        color: #a8a29e;
+      }
+
+      .t-person[data-pos="-1"] .t-name strong,
+      .t-person[data-pos="1"] .t-name strong {
+        font-weight: 500;
+        color: inherit;
+      }
+
+      /* Peek stars: same glyph size, soft scale + fade only (no width animation) */
+      .t-person[data-pos="-1"] .t-stars,
+      .t-person[data-pos="1"] .t-stars {
+        opacity: 0.5;
+        transform: scale(0.9);
+        margin-top: 0.3rem;
+      }
+
+      .t-person[data-pos="-1"] .t-stars svg,
+      .t-person[data-pos="1"] .t-stars svg {
+        fill: #f0d78c;
+      }
+
+      /*
+        Far cards staged off the top/bottom edge via top + transform only.
+        Continuous properties so enter/exit glide instead of jumping.
+      */
+      .t-person[data-pos="2"] {
+        top: 100%;
+        opacity: 0;
+        pointer-events: none;
+        z-index: 0;
+        transform: translateY(12%);
+      }
+
+      .t-person[data-pos="-2"] {
+        top: 0;
+        opacity: 0;
+        pointer-events: none;
+        z-index: 0;
+        transform: translateY(-112%);
+      }
+
+      .t-person[data-pos="-2"] .t-avatar,
+      .t-person[data-pos="2"] .t-avatar {
+        width: 3.25rem;
+        height: 3.25rem;
+      }
+    }
+
+    /* Mobile: one testimonial at a time — slide out one edge, in from the other */
+    @media (max-width: 899px) {
+      .t-person {
+        top: 50%;
+        left: 50%;
+        right: auto;
+        width: min(18rem, 88%);
+        justify-content: center;
+        /* Same active look for enter/exit so only position moves */
+      }
+
+      .t-person .t-avatar {
+        width: 4.5rem;
+        height: 4.5rem;
+      }
+
+      .t-person .t-name {
+        font-size: 0.98rem;
+        font-weight: 700;
+        color: var(--ink);
+      }
+
+      .t-person .t-stars {
+        opacity: 1;
+        transform: scale(1);
+      }
+
+      .t-person .t-stars svg {
+        fill: #eab308;
+      }
+
+      .t-person .t-meta {
+        opacity: 1;
+      }
+
+      /* Center (active) */
+      .t-person[data-pos="0"] {
+        z-index: 3;
+        opacity: 1;
+        transform: translate(-50%, -50%);
+      }
+
+      /* Staged just off the right edge → slides in when becoming active */
+      .t-person[data-pos="1"] {
+        z-index: 2;
+        opacity: 1;
+        pointer-events: none;
+        transform: translate(calc(-50% + 100vw), -50%);
+      }
+
+      /* Staged just off the left edge → slides in on prev */
+      .t-person[data-pos="-1"] {
+        z-index: 2;
+        opacity: 1;
+        pointer-events: none;
+        transform: translate(calc(-50% - 100vw), -50%);
+      }
+
+      /* Far cards stay off-stage (same edge as nearest neighbor, invisible) */
+      .t-person[data-pos="2"] {
+        z-index: 1;
+        opacity: 0;
+        pointer-events: none;
+        transform: translate(calc(-50% + 100vw), -50%);
+      }
+
+      .t-person[data-pos="-2"] {
+        z-index: 1;
+        opacity: 0;
+        pointer-events: none;
+        transform: translate(calc(-50% - 100vw), -50%);
+      }
+    }
+
+    /* Desktop video card */
+    .t-video-wrap {
+      position: relative;
+      border-radius: var(--radius);
+      overflow: hidden;
+      aspect-ratio: 16 / 10;
+      background: #1c1917;
+      box-shadow:
+        0 1px 2px rgba(12, 10, 9, 0.1),
+        0 18px 40px rgba(12, 10, 9, 0.14);
+    }
+
+    .t-video-btn {
+      display: block;
+      width: 100%;
+      height: 100%;
+      position: relative;
+      color: #fff;
+      cursor: pointer;
+      border: none;
+      padding: 0;
+      background: none;
+      text-align: left;
+      font: inherit;
+    }
+
+    .t-video-wrap img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+      transition: opacity 0.35s ease;
+    }
+
+    .t-video-wrap .t-video-shade {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(180deg,
+          rgba(12, 10, 9, 0.15) 0%,
+          rgba(12, 10, 9, 0.55) 55%,
+          rgba(12, 10, 9, 0.78) 100%);
+      pointer-events: none;
+    }
+
+    .t-video-wrap .t-play {
+      position: absolute;
+      left: 1.1rem;
+      bottom: 1.1rem;
+      width: 3.25rem;
+      height: 3.25rem;
+      border-radius: 999px;
+      border: 2px solid rgba(255, 255, 255, 0.75);
+      background: rgba(255, 255, 255, 0.12);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      backdrop-filter: blur(6px);
+      transition: background 0.15s, transform 0.15s;
+    }
+
+    .t-video-btn:hover .t-play {
+      background: rgba(255, 255, 255, 0.22);
+      transform: scale(1.04);
+    }
+
+    .t-video-wrap .t-play svg {
+      width: 1.15rem;
+      height: 1.15rem;
+      margin-left: 2px;
+      fill: #fff;
+    }
+
+    .t-video-wrap .t-quote-on-video {
+      position: absolute;
+      left: 5rem;
+      right: 1.25rem;
+      bottom: 1.15rem;
+      margin: 0;
+      font-size: clamp(0.95rem, 1.35vw, 1.12rem);
+      font-weight: 500;
+      line-height: 1.45;
+      color: #fff;
+      text-shadow: 0 1px 8px rgba(0, 0, 0, 0.35);
+      transition: opacity 0.35s ease;
+    }
+
+    .t-video-wrap img.is-fading,
+    .t-quote-on-video.is-fading,
+    .t-quote-mobile.is-fading {
+      opacity: 0;
+    }
+
+    /* Mobile: hide video card; show Watch link + quote block */
+    .t-watch {
+      display: none;
+    }
+
+    .t-quote-mobile {
+      display: none;
+      transition: opacity 0.35s ease;
+    }
+
+    @media (max-width: 899px) {
+      .t-video-wrap {
+        display: none;
+      }
+
+      .t-watch {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.55rem;
+        margin: 0.5rem auto 0;
+        padding: 0.5rem 0.75rem;
+        border: none;
+        background: none;
+        color: var(--copper);
+        font-weight: 600;
+        font-size: 1rem;
+        cursor: pointer;
+      }
+
+      .t-watch svg {
+        width: 1.65rem;
+        height: 1.65rem;
+        flex-shrink: 0;
+      }
+
+      .t-watch .t-watch-ring {
+        width: 1.65rem;
+        height: 1.65rem;
+        border-radius: 999px;
+        border: 2px solid var(--copper);
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .t-watch .t-watch-ring svg {
+        width: 0.7rem;
+        height: 0.7rem;
+        margin-left: 1px;
+        fill: var(--copper);
+      }
+
+      .t-quote-mobile {
+        display: block;
+        margin: 1.25rem auto 0;
+        max-width: 22rem;
+        text-align: center;
+        font-size: 1.05rem;
+        font-weight: 500;
+        line-height: 1.5;
+        color: var(--ink);
+        /* Lock to Emily-length quote so the white card doesn’t jump on rotate */
+        min-height: calc(1.05rem * 1.5 * 6);
+      }
+    }
+
+    @media (min-width: 900px) {
+
+      .t-watch,
+      .t-quote-mobile {
+        display: none !important;
+      }
+    }
+
+    /* YouTube lightbox */
+    .t-lightbox {
+      position: fixed;
+      inset: 0;
+      z-index: 200;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 1.25rem;
+      background: rgba(12, 10, 9, 0.72);
+      backdrop-filter: blur(6px);
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 0.25s ease, visibility 0.25s ease;
+    }
+
+    .t-lightbox.is-open {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    .t-lightbox-inner {
+      position: relative;
+      width: min(960px, 100%);
+      aspect-ratio: 16 / 9;
+      background: #0c0a09;
+      border-radius: var(--radius);
+      overflow: hidden;
+      box-shadow: 0 24px 64px rgba(0, 0, 0, 0.45);
+    }
+
+    .t-lightbox-inner iframe {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      border: 0;
+    }
+
+    .t-lightbox-close {
+      position: absolute;
+      top: -0.25rem;
+      right: -0.25rem;
+      z-index: 2;
+      width: 2.5rem;
+      height: 2.5rem;
+      border-radius: 999px;
+      border: none;
+      background: #fff;
+      color: var(--ink);
+      font-size: 1.35rem;
+      line-height: 1;
+      cursor: pointer;
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+      transform: translate(30%, -30%);
+    }
+
+    .t-lightbox-close:hover {
+      background: #fafaf9;
+    }
+
+    .t-lightbox-fallback {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 1rem;
+      padding: 1.5rem;
+      text-align: center;
+      color: #e7e5e4;
+      background: #0c0a09;
+    }
+
+    .t-lightbox-fallback[hidden] {
+      display: none;
+    }
+
+    .t-lightbox-fallback p {
+      margin: 0;
+      max-width: 28rem;
+      font-size: 0.95rem;
+      line-height: 1.5;
+      color: #a8a29e;
+    }
+
+    .t-lightbox-fallback a {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0.7rem 1.25rem;
+      border-radius: 999px;
+      background: var(--copper);
+      color: #fff;
+      font-weight: 600;
+      font-size: 0.95rem;
+      text-decoration: none;
+    }
+
+    .t-lightbox-fallback a:hover {
+      filter: brightness(1.06);
+    }
+
+    /* Lead form — Fullpath field set, DU chrome; left image / right form */
+    .lead-section {
+      margin: 0 var(--page-inset) var(--page-inset);
+      padding: clamp(2.5rem, 5vw, 3.75rem) var(--inner);
+      background: #fff;
+      border-radius: var(--radius);
+      border: 1px solid rgba(28, 25, 23, 0.06);
+    }
+
+    .lead-layout {
+      display: flex;
+      flex-direction: column;
+      gap: clamp(1.5rem, 3vw, 2.5rem);
+      width: 100%;
+      max-width: 58rem;
+      margin: 0 auto;
+      align-items: stretch;
+    }
+
+    /* Mobile: form first, 4:3 image under Submit */
+    .lead-card {
+      order: 1;
+      width: 100%;
+      max-width: 26rem;
+      margin: 0 auto;
+    }
+
+    .lead-media {
+      order: 2;
+      margin: 0;
+      width: 100%;
+      max-width: 26rem;
+      margin-left: auto;
+      margin-right: auto;
+      aspect-ratio: 4 / 3;
+      border-radius: var(--radius);
+      overflow: hidden;
+      background: #e7e5e4;
+      box-shadow:
+        0 1px 2px rgba(12, 10, 9, 0.08),
+        0 14px 32px rgba(12, 10, 9, 0.1);
+    }
+
+    .lead-media img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    @media (min-width: 900px) {
+      .lead-layout {
+        display: grid;
+        grid-template-columns: minmax(0, 1.05fr) minmax(0, 0.95fr);
+        gap: clamp(2rem, 4vw, 3.25rem);
+        align-items: center;
+        max-width: 64rem;
+      }
+
+      .lead-media {
+        order: unset;
+        max-width: none;
+        margin: 0;
+      }
+
+      .lead-card {
+        order: unset;
+        max-width: none;
+        margin: 0;
+      }
+    }
+
+    .lead-card h2 {
+      font-family: var(--display);
+      font-weight: 700;
+      font-size: clamp(1.75rem, 3.2vw, 2.15rem);
+      letter-spacing: -0.03em;
+      line-height: 1.15;
+      color: var(--ink);
+      text-align: center;
+      margin: 0 0 1.5rem;
+    }
+
+    @media (min-width: 900px) {
+      .lead-card h2 {
+        text-align: left;
+      }
+    }
+
+    .lead-form {
+      display: flex;
+      flex-direction: column;
+      gap: 0.85rem;
+    }
+
+    .lead-form .lead-fields {
+      display: flex;
+      flex-direction: column;
+      gap: 0.85rem;
+    }
+
+    .lead-form label {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      white-space: nowrap;
+      border: 0;
+    }
+
+    .lead-form input {
+      width: 100%;
+      padding: 0.95rem 1.2rem;
+      border-radius: var(--radius);
+      border: 1.5px solid #c4c0bc;
+      background: #fff;
+      color: var(--ink);
+      font-size: 1rem;
+      font-weight: 500;
+      outline: none;
+      transition: border-color 0.15s, box-shadow 0.15s;
+    }
+
+    .lead-form input::placeholder {
+      color: #8a8480;
+      font-weight: 500;
+    }
+
+    .lead-form input:hover {
+      border-color: #a8a29e;
+    }
+
+    .lead-form input:focus {
+      border-color: var(--copper);
+      box-shadow: 0 0 0 3px rgba(194, 65, 12, 0.15);
+    }
+
+    .lead-form input:user-invalid:not(:placeholder-shown):not(:focus) {
+      border-color: #b91c1c;
+    }
+
+    .lead-legal {
+      margin: 0.35rem 0 0.15rem;
+      font-size: 0.9rem;
+      line-height: 1.45;
+      color: #8a8480;
+      text-align: left;
+    }
+
+    .lead-legal a {
+      color: var(--copper);
+      font-weight: 600;
+      text-decoration: none;
+    }
+
+    .lead-legal a:hover {
+      text-decoration: underline;
+    }
+
+    .lead-form .btn-primary {
+      width: 100%;
+      margin-top: 0.35rem;
+      padding: 0.95rem 1.5rem;
+      border-radius: var(--radius);
+      font-size: 1.05rem;
+    }
+
+    .lead-form .lead-done {
+      display: none;
+      margin: 0;
+      padding: 1rem 1.15rem;
+      border-radius: var(--radius);
+      background: #f5f0eb;
+      color: var(--ink);
+      font-size: 0.98rem;
+      font-weight: 500;
+      line-height: 1.45;
+      text-align: center;
+    }
+
+    .lead-form.is-done .lead-fields,
+    .lead-form.is-done .lead-legal,
+    .lead-form.is-done .btn-primary {
+      display: none;
+    }
+
+    .lead-form.is-done .lead-done {
+      display: block;
+    }
+
+    /* Footer */
+    .site-footer {
+      margin: 0 var(--page-inset) var(--page-inset);
+      padding: clamp(2.25rem, 4.5vw, 3.25rem) var(--inner) clamp(1.5rem, 3vw, 2rem);
+      background: #1c1917;
+      color: #e7e5e4;
+      border-radius: var(--radius);
+    }
+
+    .site-footer-top {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 2rem 2.5rem;
+    }
+
+    @media (min-width: 640px) {
+      .site-footer-top {
+        grid-template-columns: 1.2fr 1fr 1fr 1fr;
+      }
+    }
+
+    .site-footer .foot-brand-block {
+      max-width: 16rem;
+    }
+
+    .site-footer .foot-brand {
+      display: flex;
+      align-items: center;
+      gap: 0.55rem;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      font-size: 1.05rem;
+      color: #fafaf9;
+    }
+
+    .site-footer .foot-brand img {
+      width: 32px;
+      height: 32px;
+      border-radius: var(--radius);
+    }
+
+    .site-footer .foot-tag {
+      margin: 0.75rem 0 0;
+      font-size: 0.9rem;
+      line-height: 1.5;
+      color: #a8a29e;
+    }
+
+    .site-footer .foot-col h3 {
+      margin: 0 0 0.85rem;
+      font-size: 0.78rem;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: #78716c;
+    }
+
+    .site-footer .foot-col ul {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 0.55rem;
+    }
+
+    .site-footer .foot-col a {
+      font-size: 0.92rem;
+      font-weight: 500;
+      color: #d6d3d1;
+      transition: color 0.15s;
+    }
+
+    .site-footer .foot-col a:hover {
+      color: #fafaf9;
+    }
+
+    .site-footer .foot-bottom {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.75rem 1.5rem;
+      margin-top: 2.25rem;
+      padding-top: 1.35rem;
+      border-top: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .site-footer .foot-copy {
+      margin: 0;
+      font-size: 0.82rem;
+      color: #78716c;
+    }
+
+    .site-footer .foot-bottom-links {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.65rem 1.15rem;
+      font-size: 0.82rem;
+      font-weight: 500;
+      color: #a8a29e;
+    }
+
+    .site-footer .foot-bottom-links a:hover {
+      color: #fafaf9;
+    }
+  </style>
+</head>
+
+<body class="du-ghl">
+
+  <script>
+    /* Set after GHL media upload if paths are not relative */
+    window.DU_MEDIA_BASE = window.DU_MEDIA_BASE || "https://cdn.jsdelivr.net/gh/AFROAgencyAI/dealer-ultimate@main/media/";
+    window.duMediaUrl = function (path) {
+      if (!path) return path;
+      var base = window.DU_MEDIA_BASE || "";
+      if (!base) return path;
+      if (base.slice(-1) !== "/") base += "/";
+      return base + String(path).replace(/^media\//, "");
+    };
+    (function () {
+      if (!window.DU_MEDIA_BASE) return;
+      document.querySelectorAll('img[src^="media/"]').forEach(function (img) {
+        img.src = window.duMediaUrl(img.getAttribute("src"));
+      });
+      var icon = document.querySelector('link[rel="icon"][href^="media/"]');
+      if (icon) icon.href = window.duMediaUrl(icon.getAttribute("href"));
+    })();
+  </script>
+
+  <header class="fake-head" id="siteHeader">
+    <div class="logo">
+      <img src="https://cdn.jsdelivr.net/gh/AFROAgencyAI/dealer-ultimate@main/media/du-logo-mark.png" alt="" width="34" height="34" />
+      <span class="logo-wordmark" aria-label="Dealer Ultimate">
+        <span>DEALER</span>
+        <span>ULTIMATE</span>
+      </span>
+    </div>
+    <nav class="links" aria-label="Primary">
+      <a href="#how">How it works</a>
+      <a href="#solutions">Solutions</a>
+      <a href="#proof">Results</a>
+    </nav>
+    <div class="head-actions">
+      <button type="button" class="nav-toggle" id="navToggle" aria-label="Open menu" aria-expanded="false"
+        aria-controls="mobileNav">
+        <svg viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+          <path d="M3.5 5.5h13M3.5 10h13M3.5 14.5h13" stroke="currentColor" stroke-width="1.75"
+            stroke-linecap="round" />
+        </svg>
+      </button>
+      <a class="btn-primary btn-primary--sm" href="#demo">Get a Demo</a>
+      <nav class="mobile-nav" id="mobileNav" aria-label="Mobile">
+        <a href="#how">How it works</a>
+        <a href="#solutions">Solutions</a>
+        <a href="#proof">Results</a>
+      </nav>
+    </div>
+  </header>
+
+  <div class="variant">
+    <section class="hero-a" aria-label="Hero">
+      <div class="hero-stage">
+        <div class="hero-text">
+          <h1>We help independent RV dealers find the units and the buyers</h1>
+          <p class="sub">
+            We put inventory and buyers on your lot so you can sell more. <span class="deal-accent">Deal?</span>
+          </p>
+          <div class="hero-actions">
+            <a class="btn-primary" href="#demo">Get a Demo</a>
+            <a class="btn-ghost" href="#how">See how it works</a>
+          </div>
+
+          <div class="select-wrap" id="select">
+            <div class="select-box">
+              <div class="select-label">I’m looking for a way to…</div>
+              <div class="select-field">
+                <button type="button" class="select-trigger" id="selectTrigger" aria-expanded="false"
+                  aria-controls="selectMenu">
+                  <span id="selectLabel">Choose a goal</span>
+                  <span class="chev" aria-hidden="true">
+                    <svg viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <path d="M7.5 4.5L13 10l-5.5 5.5" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round" />
+                    </svg>
+                  </span>
+                </button>
+                <div class="select-menu" id="selectMenu" role="listbox">
+                  <!-- Completes “I’m looking for a way to…” — maps to Solutions + dual-side offer -->
+                  <button type="button" role="option" data-href="#solutions">
+                    get better units on the lot
+                  </button>
+                  <button type="button" role="option" data-href="#solutions">
+                    move the units sitting too long
+                  </button>
+                  <button type="button" role="option" data-href="#solutions">
+                    put more shoppers on my lot
+                  </button>
+                  <button type="button" role="option" data-href="#solutions">
+                    get past buyers back for service and trade-ins
+                  </button>
+                  <button type="button" role="option" data-href="#demo">
+                    sell more units without adding headcount
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="hero-photo">
+          <img src="https://cdn.jsdelivr.net/gh/AFROAgencyAI/dealer-ultimate@main/media/du-hero-1.png" alt="Two men shaking hands on an RV dealership lot" width="1448"
+            height="1086" />
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <section class="trust-section" id="trust" aria-label="Dealers we work with">
+    <p class="trust-headline">Trusted by 200+ top dealers across North America</p>
+    <div class="trust-bar">
+      <div class="trust-track">
+        <div class="trust-group">
+          <img src="https://cdn.jsdelivr.net/gh/AFROAgencyAI/dealer-ultimate@main/media/trust-Group-62200.png" alt="" height="32" />
+          <img src="https://cdn.jsdelivr.net/gh/AFROAgencyAI/dealer-ultimate@main/media/trust-Group-62316.png" alt="" height="32" />
+          <img src="https://cdn.jsdelivr.net/gh/AFROAgencyAI/dealer-ultimate@main/media/trust-Group-62797.png" alt="" height="32" />
+          <img src="https://cdn.jsdelivr.net/gh/AFROAgencyAI/dealer-ultimate@main/media/trust-Group-62866.png" alt="" height="32" />
+          <img src="https://cdn.jsdelivr.net/gh/AFROAgencyAI/dealer-ultimate@main/media/trust-Group-62867.png" alt="" height="32" />
+          <img src="https://cdn.jsdelivr.net/gh/AFROAgencyAI/dealer-ultimate@main/media/trust-Group-62868.png" alt="" height="32" />
+          <img src="https://cdn.jsdelivr.net/gh/AFROAgencyAI/dealer-ultimate@main/media/trust-Group-62869.png" alt="" height="32" />
+          <img src="https://cdn.jsdelivr.net/gh/AFROAgencyAI/dealer-ultimate@main/media/trust-Group-62889.png" alt="" height="32" />
+          <img src="https://cdn.jsdelivr.net/gh/AFROAgencyAI/dealer-ultimate@main/media/trust-Group-62882.png" alt="" height="32" />
+          <img src="https://cdn.jsdelivr.net/gh/AFROAgencyAI/dealer-ultimate@main/media/trust-Group-62883.png" alt="" height="32" />
+          <img src="https://cdn.jsdelivr.net/gh/AFROAgencyAI/dealer-ultimate@main/media/trust-Group-62884.png" alt="" height="32" />
+          <img src="https://cdn.jsdelivr.net/gh/AFROAgencyAI/dealer-ultimate@main/media/trust-Group-62885.png" alt="" height="32" />
+          <img src="https://cdn.jsdelivr.net/gh/AFROAgencyAI/dealer-ultimate@main/media/trust-Group-62886.png" alt="" height="32" />
+        </div>
+        <div class="trust-group" aria-hidden="true">
+          <img src="https://cdn.jsdelivr.net/gh/AFROAgencyAI/dealer-ultimate@main/media/trust-Group-62200.png" alt="" height="32" />
+          <img src="https://cdn.jsdelivr.net/gh/AFROAgencyAI/dealer-ultimate@main/media/trust-Group-62316.png" alt="" height="32" />
+          <img src="https://cdn.jsdelivr.net/gh/AFROAgencyAI/dealer-ultimate@main/media/trust-Group-62797.png" alt="" height="32" />
+          <img src="https://cdn.jsdelivr.net/gh/AFROAgencyAI/dealer-ultimate@main/media/trust-Group-62866.png" alt="" height="32" />
+          <img src="https://cdn.jsdelivr.net/gh/AFROAgencyAI/dealer-ultimate@main/media/trust-Group-62867.png" alt="" height="32" />
+          <img src="https://cdn.jsdelivr.net/gh/AFROAgencyAI/dealer-ultimate@main/media/trust-Group-62868.png" alt="" height="32" />
+          <img src="https://cdn.jsdelivr.net/gh/AFROAgencyAI/dealer-ultimate@main/media/trust-Group-62869.png" alt="" height="32" />
+          <img src="https://cdn.jsdelivr.net/gh/AFROAgencyAI/dealer-ultimate@main/media/trust-Group-62889.png" alt="" height="32" />
+          <img src="https://cdn.jsdelivr.net/gh/AFROAgencyAI/dealer-ultimate@main/media/trust-Group-62882.png" alt="" height="32" />
+          <img src="https://cdn.jsdelivr.net/gh/AFROAgencyAI/dealer-ultimate@main/media/trust-Group-62883.png" alt="" height="32" />
+          <img src="https://cdn.jsdelivr.net/gh/AFROAgencyAI/dealer-ultimate@main/media/trust-Group-62884.png" alt="" height="32" />
+          <img src="https://cdn.jsdelivr.net/gh/AFROAgencyAI/dealer-ultimate@main/media/trust-Group-62885.png" alt="" height="32" />
+          <img src="https://cdn.jsdelivr.net/gh/AFROAgencyAI/dealer-ultimate@main/media/trust-Group-62886.png" alt="" height="32" />
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Fullpath-style stats + mini viz, DealerNerds case-study numbers -->
+  <section class="stats-section" id="results" aria-label="Results">
+    <div class="stats-grid">
+      <article class="stat-card">
+        <div class="stat-viz" aria-hidden="true"><svg viewBox="0 0 360 220" preserveAspectRatio="xMidYMax slice"
+            xmlns="http://www.w3.org/2000/svg" focusable="false">
+            <path
+              d="M -8 196 L 38 188 L 84 166 L 130 158 L 176 128 L 222 120 L 268 86 L 314 76 L 368 44 L 368 220.0 L -8 220.0 Z"
+              fill="rgba(250,250,249,.2)" />
+            <path d="M -8 196 L 38 188 L 84 166 L 130 158 L 176 128 L 222 120 L 268 86 L 314 76 L 368 44" fill="none"
+              stroke="rgba(250,250,249,.5)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" />
+            <path d="M 38 194 V 220.0" stroke="rgba(250,250,249,.2)" stroke-width="1.5" stroke-dasharray="4 5" />
+            <path d="M 130 164 V 220.0" stroke="rgba(250,250,249,.2)" stroke-width="1.5" stroke-dasharray="4 5" />
+            <path d="M 222 126 V 220.0" stroke="rgba(250,250,249,.2)" stroke-width="1.5" stroke-dasharray="4 5" />
+            <path d="M 314 82 V 220.0" stroke="rgba(250,250,249,.2)" stroke-width="1.5" stroke-dasharray="4 5" />
+            <circle cx="38" cy="188" r="5" fill="#7C2D12" />
+            <circle cx="84" cy="166" r="6.5" fill="#FAFAF9" />
+            <circle cx="130" cy="158" r="5" fill="#7C2D12" />
+            <circle cx="176" cy="128" r="5" fill="#7C2D12" />
+            <circle cx="222" cy="120" r="6.5" fill="#FAFAF9" />
+            <circle cx="268" cy="86" r="5" fill="#7C2D12" />
+            <circle cx="314" cy="76" r="5" fill="#7C2D12" />
+            <circle cx="368" cy="44" r="6.5" fill="#FAFAF9" />
+          </svg></div>
+        <div class="stat-top">
+          <div class="stat-label">in units our dealers have moved</div>
+          <div class="stat-num">$25M</div>
+        </div>
+      </article>
+      <article class="stat-card">
+        <div class="stat-viz" aria-hidden="true"><svg viewBox="0 0 360 220" preserveAspectRatio="xMidYMax slice"
+            xmlns="http://www.w3.org/2000/svg" focusable="false">
+            <rect x="3.0" y="198.0" width="6.0" height="16.0" rx="3" fill="#FAFAF9" opacity="0.200" />
+            <rect x="15.0" y="189.6" width="6.0" height="24.4" rx="3" fill="#FAFAF9" opacity="0.203" />
+            <rect x="27.0" y="198.6" width="6.0" height="15.4" rx="3" fill="#FAFAF9" opacity="0.210" />
+            <rect x="39.0" y="181.4" width="6.0" height="32.6" rx="3" fill="#FAFAF9" opacity="0.219" />
+            <rect x="51.0" y="187.9" width="6.0" height="26.1" rx="3" fill="#FAFAF9" opacity="0.230" />
+            <rect x="63.0" y="193.3" width="6.0" height="20.7" rx="3" fill="#FAFAF9" opacity="0.243" />
+            <rect x="75.0" y="175.6" width="6.0" height="38.4" rx="3" fill="#FAFAF9" opacity="0.258" />
+            <rect x="87.0" y="180.8" width="6.0" height="33.2" rx="3" fill="#FAFAF9" opacity="0.274" />
+            <rect x="99.0" y="187.8" width="6.0" height="26.2" rx="3" fill="#FAFAF9" opacity="0.292" />
+            <rect x="111.0" y="170.8" width="6.0" height="43.2" rx="3" fill="#FAFAF9" opacity="0.311" />
+            <rect x="123.0" y="159.6" width="6.0" height="54.4" rx="3" fill="#FAFAF9" opacity="0.331" />
+            <rect x="135.0" y="172.4" width="6.0" height="41.6" rx="3" fill="#FAFAF9" opacity="0.353" />
+            <rect x="147.0" y="160.1" width="6.0" height="53.9" rx="3" fill="#FAFAF9" opacity="0.375" />
+            <rect x="159.0" y="169.8" width="6.0" height="44.2" rx="3" fill="#FAFAF9" opacity="0.399" />
+            <rect x="171.0" y="149.4" width="6.0" height="64.6" rx="3" fill="#FAFAF9" opacity="0.425" />
+            <rect x="183.0" y="155.9" width="6.0" height="58.1" rx="3" fill="#FAFAF9" opacity="0.451" />
+            <rect x="195.0" y="157.4" width="6.0" height="56.6" rx="3" fill="#FAFAF9" opacity="0.478" />
+            <rect x="207.0" y="136.8" width="6.0" height="77.2" rx="3" fill="#FAFAF9" opacity="0.506" />
+            <rect x="219.0" y="142.1" width="6.0" height="71.9" rx="3" fill="#FAFAF9" opacity="0.536" />
+            <rect x="231.0" y="149.4" width="6.0" height="64.6" rx="3" fill="#FAFAF9" opacity="0.566" />
+            <rect x="243.0" y="130.7" width="6.0" height="83.3" rx="3" fill="#FAFAF9" opacity="0.597" />
+            <rect x="255.0" y="118.9" width="6.0" height="95.1" rx="3" fill="#FAFAF9" opacity="0.630" />
+            <rect x="267.0" y="132.0" width="6.0" height="82.0" rx="3" fill="#FAFAF9" opacity="0.663" />
+            <rect x="279.0" y="117.1" width="6.0" height="96.9" rx="3" fill="#FAFAF9" opacity="0.697" />
+            <rect x="291.0" y="128.2" width="6.0" height="85.8" rx="3" fill="#FAFAF9" opacity="0.732" />
+            <rect x="303.0" y="114.3" width="6.0" height="99.7" rx="3" fill="#FAFAF9" opacity="0.768" />
+            <rect x="315.0" y="103.2" width="6.0" height="110.8" rx="3" fill="#FAFAF9" opacity="0.805" />
+            <rect x="327.0" y="114.2" width="6.0" height="99.8" rx="3" fill="#FAFAF9" opacity="0.842" />
+            <rect x="339.0" y="98.1" width="6.0" height="115.9" rx="3" fill="#FAFAF9" opacity="0.881" />
+            <rect x="351.0" y="100.0" width="6.0" height="114.0" rx="3" fill="#FAFAF9" opacity="0.920" />
+            <path d="M -8 217.0 H 368" stroke="rgba(250,250,249,.5)" stroke-width="1.5" />
+          </svg></div>
+        <div class="stat-top">
+          <div class="stat-label">leads in the first 30 days</div>
+          <div class="stat-num">1,200</div>
+        </div>
+      </article>
+      <article class="stat-card">
+        <div class="stat-viz" aria-hidden="true"><svg viewBox="0 0 360 220" preserveAspectRatio="xMidYMax slice"
+            xmlns="http://www.w3.org/2000/svg" focusable="false">
+            <path d="M -6 150 L 52 138" stroke="rgba(250,250,249,.2)" stroke-width="1.4" />
+            <path d="M 52 138 L 112 158" stroke="rgba(250,250,249,.2)" stroke-width="1.4" />
+            <path d="M 112 158 L 160 140" stroke="rgba(250,250,249,.2)" stroke-width="1.4" />
+            <path d="M 160 140 L 262 142" stroke="rgba(250,250,249,.2)" stroke-width="1.4" />
+            <path d="M 262 142 L 322 156" stroke="rgba(250,250,249,.2)" stroke-width="1.4" />
+            <path d="M 322 156 L 368 138" stroke="rgba(250,250,249,.2)" stroke-width="1.4" />
+            <path d="M 28 206 L 96 196" stroke="rgba(250,250,249,.2)" stroke-width="1.4" />
+            <path d="M 96 196 L 300 204" stroke="rgba(250,250,249,.2)" stroke-width="1.4" />
+            <path d="M 52 138 L 28 206" stroke="rgba(250,250,249,.2)" stroke-width="1.4" />
+            <path d="M 112 158 L 96 196" stroke="rgba(250,250,249,.2)" stroke-width="1.4" />
+            <path d="M 322 156 L 300 204" stroke="rgba(250,250,249,.2)" stroke-width="1.4" />
+            <path d="M 214.0 172.0 L -6 150" stroke="rgba(250,250,249,.5)" stroke-width="1.5" />
+            <path d="M 214.0 172.0 L 52 138" stroke="rgba(250,250,249,.5)" stroke-width="1.5" />
+            <path d="M 214.0 172.0 L 112 158" stroke="rgba(250,250,249,.5)" stroke-width="1.5" />
+            <path d="M 214.0 172.0 L 160 140" stroke="rgba(250,250,249,.5)" stroke-width="1.5" />
+            <path d="M 214.0 172.0 L 262 142" stroke="rgba(250,250,249,.5)" stroke-width="1.5" />
+            <path d="M 214.0 172.0 L 322 156" stroke="rgba(250,250,249,.5)" stroke-width="1.5" />
+            <path d="M 214.0 172.0 L 368 138" stroke="rgba(250,250,249,.5)" stroke-width="1.5" />
+            <path d="M 214.0 172.0 L 28 206" stroke="rgba(250,250,249,.5)" stroke-width="1.5" />
+            <path d="M 214.0 172.0 L 96 196" stroke="rgba(250,250,249,.5)" stroke-width="1.5" />
+            <path d="M 214.0 172.0 L 300 204" stroke="rgba(250,250,249,.5)" stroke-width="1.5" />
+            <circle cx="-6" cy="150" r="7.5" fill="#FAFAF9" />
+            <circle cx="52" cy="138" r="6" fill="#7C2D12" />
+            <circle cx="112" cy="158" r="6" fill="#7C2D12" />
+            <circle cx="160" cy="140" r="7.5" fill="#FAFAF9" />
+            <circle cx="262" cy="142" r="6" fill="#7C2D12" />
+            <circle cx="322" cy="156" r="6" fill="#7C2D12" />
+            <circle cx="368" cy="138" r="7.5" fill="#FAFAF9" />
+            <circle cx="28" cy="206" r="6" fill="#7C2D12" />
+            <circle cx="96" cy="196" r="6" fill="#7C2D12" />
+            <circle cx="300" cy="204" r="7.5" fill="#FAFAF9" />
+            <circle cx="214.0" cy="172.0" r="19" fill="rgba(250,250,249,.2)" />
+            <circle cx="214.0" cy="172.0" r="11" fill="#FAFAF9" />
+          </svg></div>
+        <div class="stat-top">
+          <div class="stat-label">DMS and CRM platforms we plug into</div>
+          <div class="stat-num">10+</div>
+        </div>
+      </article>
+    </div>
+  </section>
+
+  <section class="how-section" id="how" aria-labelledby="how-heading">
+    <h2 id="how-heading">How it works</h2>
+    <div class="how-tx" id="howTx">
+      <!-- Shared image outside accordion — mobile above list, desktop left -->
+      <div class="how-tx-media" aria-hidden="true">
+        <div class="how-tx-shot is-active" data-how="buyers">
+          <img src="https://cdn.jsdelivr.net/gh/AFROAgencyAI/dealer-ultimate@main/media/du-more-buyers-1.png" alt="" width="1448" height="1086" />
+        </div>
+        <div class="how-tx-shot" data-how="inventory">
+          <img src="https://cdn.jsdelivr.net/gh/AFROAgencyAI/dealer-ultimate@main/media/du-more-inventory-1.png" alt="" width="1448" height="1086" />
+        </div>
+        <div class="how-tx-shot" data-how="sales">
+          <!-- No separate more-sales master in du-images; reuse hero close until one lands -->
+          <img src="https://cdn.jsdelivr.net/gh/AFROAgencyAI/dealer-ultimate@main/media/du-hero-1.png" alt="" width="1448" height="1086" />
+        </div>
+      </div>
+
+      <div class="how-tx-list">
+        <div class="how-item is-open" data-how="buyers">
+          <button type="button" class="how-trigger" aria-expanded="true" aria-controls="how-panel-buyers"
+            id="how-tab-buyers">
+            <span class="step-num">01</span>
+            <span class="how-tab-label">More buyers</span>
+          </button>
+          <div class="how-body" id="how-panel-buyers" role="region" aria-labelledby="how-tab-buyers">
+            <div class="how-body-inner">
+              <p>We put shoppers on your lot through the channels that start real conversations: walk-ins, calls, chat,
+                text, and leads.</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="how-item" data-how="inventory">
+          <button type="button" class="how-trigger" aria-expanded="false" aria-controls="how-panel-inventory"
+            id="how-tab-inventory">
+            <span class="step-num">02</span>
+            <span class="how-tab-label">More inventory</span>
+          </button>
+          <div class="how-body" id="how-panel-inventory" role="region" aria-labelledby="how-tab-inventory">
+            <div class="how-body-inner">
+              <p>We help you source the used units independents actually need, so the lot isn’t waiting on allocation
+                that never comes.</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="how-item" data-how="sales">
+          <button type="button" class="how-trigger" aria-expanded="false" aria-controls="how-panel-sales"
+            id="how-tab-sales">
+            <span class="step-num">03</span>
+            <span class="how-tab-label">More sales</span>
+          </button>
+          <div class="how-body" id="how-panel-sales" role="region" aria-labelledby="how-tab-sales">
+            <div class="how-body-inner">
+              <p>Inventory on the ground and buyers in the driveway. You close.</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="how-foot">
+          <p class="deal-line">Bottom line: you sell more units. <span class="deal-accent">Deal?</span></p>
+          <a class="btn-primary" href="#demo">Get a Demo</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Solutions — three flagship services, copy locked in du-research/09-SOLUTIONS.md -->
+  <section class="sol-section" id="solutions" aria-labelledby="sol-heading">
+    <h2 id="sol-heading">Where do you want to start?</h2>
+    <div class="sol-grid">
+      <article class="sol-card">
+        <div class="sol-media" aria-hidden="true">
+          <img src="https://cdn.jsdelivr.net/gh/AFROAgencyAI/dealer-ultimate@main/media/du-service-1.png" alt="" width="1448" height="1086" />
+          <span class="sol-wash"></span>
+        </div>
+        <div class="sol-body">
+          <h3>Buyback</h3>
+          <p>We find people near you ready to sell their camper, and book them in for an appraisal.</p>
+          <a class="btn-primary btn-primary--sm sol-more" href="#demo">Learn more<span class="sr-only"> about Buyback</span></a>
+        </div>
+      </article>
+      <article class="sol-card">
+        <div class="sol-media" aria-hidden="true">
+          <img src="https://cdn.jsdelivr.net/gh/AFROAgencyAI/dealer-ultimate@main/media/du-service-2.png" alt="" width="1448" height="1086" />
+          <span class="sol-wash"></span>
+        </div>
+        <div class="sol-body">
+          <h3>Move Units</h3>
+          <p>Every unit on your lot gets in front of buyers, and the ones sitting too long get prioritized.</p>
+          <a class="btn-primary btn-primary--sm sol-more" href="#demo">Learn more<span class="sr-only"> about Move Units</span></a>
+        </div>
+      </article>
+      <article class="sol-card">
+        <div class="sol-media" aria-hidden="true">
+          <img src="https://cdn.jsdelivr.net/gh/AFROAgencyAI/dealer-ultimate@main/media/du-service-3.png" alt="" width="1448" height="1086" />
+          <span class="sol-wash"></span>
+        </div>
+        <div class="sol-body">
+          <h3>Service and Trade-Ins</h3>
+          <p>Your past buyers hear from you at the right moment, and the dead leads in your CRM go back to work.</p>
+          <a class="btn-primary btn-primary--sm sol-more" href="#demo">Learn more<span class="sr-only"> about Service and Trade-Ins</span></a>
+        </div>
+      </article>
+    </div>
+  </section>
+
+  <!-- Fullpath-style testimonials (Fullpath → Dealer Ultimate; YT links kept) -->
+  <section class="t-section" id="proof" aria-label="Testimonials">
+    <div class="t-head">
+      <h2>Real dealers, real results.</h2>
+      <div class="t-nav t-nav--desktop">
+        <button type="button" class="t-arrow t-prev" aria-label="Previous testimonial">
+          <svg viewBox="0 0 20 20" fill="none" aria-hidden="true">
+            <path d="M12.5 4.5L7 10l5.5 5.5" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+              stroke-linejoin="round" />
+          </svg>
+        </button>
+        <div class="t-dots" data-t-dots aria-hidden="true"></div>
+        <button type="button" class="t-arrow t-next" aria-label="Next testimonial">
+          <svg viewBox="0 0 20 20" fill="none" aria-hidden="true">
+            <path d="M7.5 4.5L13 10l-5.5 5.5" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+              stroke-linejoin="round" />
+          </svg>
+        </button>
+      </div>
+    </div>
+
+    <div class="t-body">
+      <div class="t-grid">
+        <div class="t-stack" id="tStack" aria-live="polite"></div>
+
+        <div class="t-video-wrap" id="tVideo">
+          <button type="button" class="t-video-btn" id="tVideoBtn" aria-label="Watch the video">
+            <img id="tVideoImg" src="https://cdn.jsdelivr.net/gh/AFROAgencyAI/dealer-ultimate@main/media/testimonial-emily-video.png" alt="" width="491" height="295" />
+            <span class="t-video-shade" aria-hidden="true"></span>
+            <span class="t-play" aria-hidden="true">
+              <svg viewBox="0 0 20 20" aria-hidden="true">
+                <path d="M6.5 4.5v11l10-5.5-10-5.5z" />
+              </svg>
+            </span>
+            <p class="t-quote-on-video" id="tQuoteDesktop"></p>
+          </button>
+        </div>
+      </div>
+
+      <!-- Mobile-only: Watch the Video + quote (Fullpath mobile) -->
+      <button type="button" class="t-watch" id="tWatchMobile">
+        <span class="t-watch-ring" aria-hidden="true">
+          <svg viewBox="0 0 20 20" aria-hidden="true">
+            <path d="M6.5 4.5v11l10-5.5-10-5.5z" />
+          </svg>
+        </span>
+        Watch the Video
+      </button>
+      <p class="t-quote-mobile" id="tQuoteMobile"></p>
+
+      <div class="t-nav t-nav--mobile">
+        <button type="button" class="t-arrow t-prev" aria-label="Previous testimonial">
+          <svg viewBox="0 0 20 20" fill="none" aria-hidden="true">
+            <path d="M12.5 4.5L7 10l5.5 5.5" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+              stroke-linejoin="round" />
+          </svg>
+        </button>
+        <div class="t-dots" data-t-dots aria-hidden="true"></div>
+        <button type="button" class="t-arrow t-next" aria-label="Next testimonial">
+          <svg viewBox="0 0 20 20" fill="none" aria-hidden="true">
+            <path d="M7.5 4.5L13 10l-5.5 5.5" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+              stroke-linejoin="round" />
+          </svg>
+        </button>
+      </div>
+    </div>
+  </section>
+
+  <!-- YouTube lightbox (same page) -->
+  <div class="t-lightbox" id="tLightbox" hidden>
+    <div class="t-lightbox-inner">
+      <button type="button" class="t-lightbox-close" id="tLightboxClose" aria-label="Close video">×</button>
+      <iframe id="tLightboxFrame" title="Testimonial video"
+        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+        allowfullscreen referrerpolicy="strict-origin-when-cross-origin"></iframe>
+      <div class="t-lightbox-fallback" id="tLightboxFallback" hidden>
+        <p>YouTube won’t play embeds from a local file. Open the video on YouTube, or serve this folder over
+          http://localhost.</p>
+        <a id="tLightboxYtLink" href="#" target="_blank" rel="noopener noreferrer">Watch on YouTube</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Lead form (Fullpath fields → Dealer Ultimate); left image / right form -->
+  <section class="lead-section" id="demo" aria-label="Get a demo">
+    <div class="lead-layout">
+      <figure class="lead-media">
+        <img src="https://cdn.jsdelivr.net/gh/AFROAgencyAI/dealer-ultimate@main/media/du-contact-1.png" alt="Dealership principal and salesperson walking the RV lot at sunset" width="1448"
+          height="1086" />
+      </figure>
+
+      <div class="lead-card">
+        <h2>Get in touch!</h2>
+        <form class="lead-form" id="leadForm" novalidate>
+          <div class="lead-fields">
+            <label for="leadName">Name</label>
+            <input id="leadName" name="name" type="text" autocomplete="name" placeholder="Name*" required />
+
+            <label for="leadEmail">Work Email</label>
+            <input id="leadEmail" name="email" type="email" autocomplete="email" placeholder="Work Email*" required />
+
+            <label for="leadPhone">Phone</label>
+            <input id="leadPhone" name="phone" type="tel" autocomplete="tel" placeholder="Phone*" required />
+
+            <label for="leadDealership">Dealership</label>
+            <input id="leadDealership" name="dealership" type="text" autocomplete="organization"
+              placeholder="Dealership*" required />
+
+            <label for="leadInventory">Inventory Size</label>
+            <input id="leadInventory" name="inventory" type="text" inputmode="numeric" placeholder="Inventory Size" />
+          </div>
+
+          <p class="lead-legal">
+            By submitting this form I accept Dealer Ultimate’s
+            <a href="#privacy">privacy policy</a>
+          </p>
+
+          <button type="submit" class="btn-primary">Submit</button>
+          <p class="lead-done" role="status">Thanks. We’ll be in touch shortly.</p>
+        </form>
+      </div>
+    </div>
+  </section>
+
+  <footer class="site-footer">
+    <div class="site-footer-top">
+      <div class="foot-brand-block">
+        <div class="foot-brand">
+          <img src="https://cdn.jsdelivr.net/gh/AFROAgencyAI/dealer-ultimate@main/media/du-logo-mark.png" alt="" width="32" height="32" />
+          Dealer Ultimate
+        </div>
+        <p class="foot-tag">Inventory and buyers on the lot for independent RV dealers.</p>
+      </div>
+
+      <div class="foot-col">
+        <h3>Product</h3>
+        <ul>
+          <li><a href="#how">How it works</a></li>
+          <li><a href="#solutions">Solutions</a></li>
+          <li><a href="#proof">Results</a></li>
+          <li><a href="#proof">Testimonials</a></li>
+          <li><a href="#demo">Get a Demo</a></li>
+        </ul>
+      </div>
+
+      <div class="foot-col">
+        <h3>Company</h3>
+        <ul>
+          <li><a href="#about">About</a></li>
+          <li><a href="#careers">Careers</a></li>
+          <li><a href="#partners">Partners</a></li>
+          <li><a href="#demo">Contact</a></li>
+        </ul>
+      </div>
+
+      <div class="foot-col">
+        <h3>Policies</h3>
+        <ul>
+          <li><a href="#privacy">Privacy Policy</a></li>
+          <li><a href="#terms">Terms of Service</a></li>
+          <li><a href="#cookies">Cookie Policy</a></li>
+          <li><a href="#accessibility">Accessibility</a></li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="foot-bottom">
+      <p class="foot-copy">© 2026 Dealer Ultimate. All rights reserved.</p>
+      <div class="foot-bottom-links">
+        <a href="#privacy">Privacy</a>
+        <a href="#terms">Terms</a>
+        <a href="#cookies">Cookies</a>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    (function () {
+      var trigger = document.getElementById("selectTrigger");
+      var menu = document.getElementById("selectMenu");
+      var label = document.getElementById("selectLabel");
+      var field = trigger.closest(".select-field");
+      var photo = document.querySelector(".hero-photo");
+      var textCol = document.querySelector(".hero-text");
+      var mqDesktop = window.matchMedia("(min-width: 1024px)");
+      var navToggle = document.getElementById("navToggle");
+      var mobileNav = document.getElementById("mobileNav");
+
+      /* Lead form — demo only, no backend */
+      (function initLeadForm() {
+        var form = document.getElementById("leadForm");
+        if (!form) return;
+        form.addEventListener("submit", function (e) {
+          e.preventDefault();
+          if (!form.checkValidity()) {
+            form.reportValidity();
+            return;
+          }
+          form.classList.add("is-done");
+        });
+      })();
+
+      /* Testimonials carousel (Fullpath lift, infinite manual + lightbox) */
+      (function initTestimonials() {
+        var people = [
+          {
+            name: "Emily Androsky",
+            role: "Marketing Director, Berge Auto",
+            avatar: "https://cdn.jsdelivr.net/gh/AFROAgencyAI/dealer-ultimate@main/media/testimonial-emily-avatar.png",
+            video: "https://cdn.jsdelivr.net/gh/AFROAgencyAI/dealer-ultimate@main/media/testimonial-emily-video.png",
+            ytId: "KweozYqEcCw",
+            quote:
+              "Dealer Ultimate is helping us truly look at the customer from more facets than we even realized existed so the journey from beginning to end is something they feel happy with."
+          },
+          {
+            name: "Joyce Balaoro",
+            role: "Marketing Director, Findlay Auto",
+            avatar: "https://cdn.jsdelivr.net/gh/AFROAgencyAI/dealer-ultimate@main/media/testimonial-joyce-avatar.png",
+            video: "https://cdn.jsdelivr.net/gh/AFROAgencyAI/dealer-ultimate@main/media/testimonial-joyce-video.png",
+            ytId: "fg6kyznckOs",
+            quote:
+              "Dealer Ultimate teed us up so well for success and that’s what I love about them. They really truly save our lives here at Findlay Chevrolet."
+          },
+          {
+            name: "Alex Gauthier",
+            role: "Director of Marketing, Heuberger Subaru",
+            avatar: "https://cdn.jsdelivr.net/gh/AFROAgencyAI/dealer-ultimate@main/media/testimonial-alex-avatar.png",
+            video: "https://cdn.jsdelivr.net/gh/AFROAgencyAI/dealer-ultimate@main/media/testimonial-alex-video.png",
+            ytId: "s6wOZmd5VV0",
+            quote:
+              "Having access to our own first-party data represents a completely new horizon for what’s possible."
+          },
+          {
+            name: "Debbie Waines",
+            role: "Advertising and Marketing Director, John Elway",
+            avatar: "https://cdn.jsdelivr.net/gh/AFROAgencyAI/dealer-ultimate@main/media/testimonial-debbie-avatar.png",
+            video: "https://cdn.jsdelivr.net/gh/AFROAgencyAI/dealer-ultimate@main/media/testimonial-debbie-video.png",
+            ytId: "ibH9ugbeUXA",
+            quote:
+              "Dealer Ultimate is always looking for ways to reinvent themselves, to make our ability to contact our guests quicker and automated. You add AI to it and I don’t know how they will be stopped."
+          },
+          {
+            name: "Colin Carrasquillo",
+            role: "Digital Marketing Director, Nielson Automotive",
+            avatar: "https://cdn.jsdelivr.net/gh/AFROAgencyAI/dealer-ultimate@main/media/testimonial-colin-avatar.png",
+            video: "https://cdn.jsdelivr.net/gh/AFROAgencyAI/dealer-ultimate@main/media/testimonial-colin-video.png",
+            ytId: "jIfsuHNkD_0",
+            quote:
+              "If you want to talk about actionable CDPs, this is the one! Dealer Ultimate is the one who makes it actionable and can deliver on that."
+          }
+        ];
+
+        var stack = document.getElementById("tStack");
+        var videoBtn = document.getElementById("tVideoBtn");
+        var videoImg = document.getElementById("tVideoImg");
+        var quoteDesktop = document.getElementById("tQuoteDesktop");
+        var quoteMobile = document.getElementById("tQuoteMobile");
+        var watchMobile = document.getElementById("tWatchMobile");
+        var lightbox = document.getElementById("tLightbox");
+        var lightboxFrame = document.getElementById("tLightboxFrame");
+        var lightboxClose = document.getElementById("tLightboxClose");
+        var lightboxFallback = document.getElementById("tLightboxFallback");
+        var lightboxYtLink = document.getElementById("tLightboxYtLink");
+        var prevBtns = Array.prototype.slice.call(document.querySelectorAll(".t-prev"));
+        var nextBtns = Array.prototype.slice.call(document.querySelectorAll(".t-next"));
+        var dotsHosts = Array.prototype.slice.call(document.querySelectorAll("[data-t-dots]"));
+        if (!stack || !prevBtns.length || !nextBtns.length) return;
+
+        if (window.duMediaUrl) {
+          people.forEach(function (p) {
+            p.avatar = window.duMediaUrl(p.avatar);
+            p.video = window.duMediaUrl(p.video);
+          });
+        }
+        var n = people.length;
+        var idx = 0;
+        var starSvg =
+          '<svg viewBox="0 0 20 20" aria-hidden="true"><path d="M10 1.8l2.35 4.76 5.25.76-3.8 3.7.9 5.23L10 13.77 5.3 16.25l.9-5.23-3.8-3.7 5.25-.76L10 1.8z"/></svg>';
+
+        people.forEach(function (p, i) {
+          var art = document.createElement("article");
+          art.className = "t-person";
+          art.setAttribute("data-i", String(i));
+          art.innerHTML =
+            '<div class="t-avatar"><img src="' +
+            p.avatar +
+            '" alt="" width="100" height="100" /></div>' +
+            '<div class="t-meta">' +
+            '<p class="t-name"><strong>' +
+            p.name +
+            "</strong>, " +
+            p.role +
+            "</p>" +
+            '<div class="t-stars" aria-label="5 stars">' +
+            starSvg +
+            starSvg +
+            starSvg +
+            starSvg +
+            starSvg +
+            "</div>" +
+            "</div>";
+          stack.appendChild(art);
+
+          dotsHosts.forEach(function (host) {
+            var dot = document.createElement("span");
+            dot.className = "t-dot";
+            host.appendChild(dot);
+          });
+        });
+
+        var cards = Array.prototype.slice.call(stack.querySelectorAll(".t-person"));
+
+        function relPos(i, active) {
+          var d = (i - active + n) % n;
+          if (d > Math.floor(n / 2)) d -= n;
+          return d;
+        }
+
+        function openLightbox() {
+          var p = people[idx];
+          var id = p.ytId;
+          if (!lightbox || !id) return;
+          var watchUrl = "https://www.youtube.com/watch?v=" + id;
+          /* Error 153: YouTube blocks embeds from null origin (file://). */
+          var isLocalFile = location.protocol === "file:";
+          if (isLocalFile || !lightboxFrame) {
+            if (lightboxFrame) {
+              lightboxFrame.removeAttribute("src");
+              lightboxFrame.style.display = "none";
+            }
+            if (lightboxFallback) lightboxFallback.hidden = false;
+            if (lightboxYtLink) lightboxYtLink.href = watchUrl;
+          } else {
+            if (lightboxFallback) lightboxFallback.hidden = true;
+            lightboxFrame.style.display = "";
+            var origin = encodeURIComponent(location.origin);
+            lightboxFrame.src =
+              "https://www.youtube-nocookie.com/embed/" +
+              id +
+              "?autoplay=1&rel=0&modestbranding=1&playsinline=1&origin=" +
+              origin;
+          }
+          lightbox.hidden = false;
+          requestAnimationFrame(function () {
+            lightbox.classList.add("is-open");
+          });
+          document.body.style.overflow = "hidden";
+        }
+
+        function closeLightbox() {
+          if (!lightbox) return;
+          lightbox.classList.remove("is-open");
+          document.body.style.overflow = "";
+          setTimeout(function () {
+            lightbox.hidden = true;
+            if (lightboxFrame) {
+              lightboxFrame.src = "";
+              lightboxFrame.style.display = "";
+            }
+            if (lightboxFallback) lightboxFallback.hidden = true;
+          }, 250);
+        }
+
+        var contentBusy = false;
+        var contentFadeMs = 320;
+
+        function applyContent(p) {
+          if (videoImg) {
+            videoImg.src = p.video;
+            videoImg.alt = p.name;
+          }
+          var q = '"' + p.quote + '"';
+          if (quoteDesktop) quoteDesktop.textContent = q;
+          if (quoteMobile) quoteMobile.textContent = q;
+        }
+
+        function paintPeople() {
+          cards.forEach(function (card, i) {
+            card.setAttribute("data-pos", String(relPos(i, idx)));
+          });
+          dotsHosts.forEach(function (host) {
+            Array.prototype.forEach.call(host.querySelectorAll(".t-dot"), function (dot, di) {
+              dot.classList.toggle("is-active", di === idx);
+            });
+          });
+        }
+
+        function revealContent(fadeEls) {
+          requestAnimationFrame(function () {
+            fadeEls.forEach(function (el) {
+              el.classList.remove("is-fading");
+            });
+            contentBusy = false;
+          });
+        }
+
+        function paintContent(animated) {
+          var p = people[idx];
+          if (!p) return;
+          var fadeEls = [videoImg, quoteDesktop, quoteMobile].filter(Boolean);
+          var reduce =
+            window.matchMedia &&
+            window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+          if (!animated || reduce || !fadeEls.length) {
+            applyContent(p);
+            fadeEls.forEach(function (el) {
+              el.classList.remove("is-fading");
+            });
+            contentBusy = false;
+            return;
+          }
+          if (contentBusy) {
+            applyContent(p);
+            fadeEls.forEach(function (el) {
+              el.classList.remove("is-fading");
+            });
+            contentBusy = false;
+            return;
+          }
+          contentBusy = true;
+          fadeEls.forEach(function (el) {
+            el.classList.add("is-fading");
+          });
+          setTimeout(function () {
+            var prevSrc = videoImg ? videoImg.src : "";
+            applyContent(p);
+            if (videoImg && videoImg.src !== prevSrc && !videoImg.complete) {
+              var onLoad = function () {
+                videoImg.removeEventListener("load", onLoad);
+                revealContent(fadeEls);
+              };
+              videoImg.addEventListener("load", onLoad);
+              /* Fallback if load never fires */
+              setTimeout(function () {
+                videoImg.removeEventListener("load", onLoad);
+                if (contentBusy) revealContent(fadeEls);
+              }, 800);
+            } else {
+              revealContent(fadeEls);
+            }
+          }, contentFadeMs);
+        }
+
+        function paint(animated) {
+          paintPeople();
+          paintContent(animated !== false);
+        }
+
+        function go(delta) {
+          idx = (idx + delta + n) % n;
+          paint(true);
+        }
+
+        prevBtns.forEach(function (btn) {
+          btn.addEventListener("click", function () {
+            go(-1);
+          });
+        });
+        nextBtns.forEach(function (btn) {
+          btn.addEventListener("click", function () {
+            go(1);
+          });
+        });
+
+        /* Mobile swipe: current exits one edge, next enters from the other */
+        (function () {
+          var startX = 0;
+          var startY = 0;
+          var tracking = false;
+          var threshold = 48;
+          stack.addEventListener(
+            "touchstart",
+            function (e) {
+              if (!e.touches || !e.touches.length) return;
+              tracking = true;
+              startX = e.touches[0].clientX;
+              startY = e.touches[0].clientY;
+            },
+            { passive: true }
+          );
+          stack.addEventListener(
+            "touchend",
+            function (e) {
+              if (!tracking || !e.changedTouches || !e.changedTouches.length) return;
+              tracking = false;
+              var dx = e.changedTouches[0].clientX - startX;
+              var dy = e.changedTouches[0].clientY - startY;
+              if (Math.abs(dx) < threshold || Math.abs(dx) < Math.abs(dy)) return;
+              if (dx < 0) go(1);
+              else go(-1);
+            },
+            { passive: true }
+          );
+          stack.addEventListener("touchcancel", function () {
+            tracking = false;
+          });
+        })();
+
+        if (videoBtn) {
+          videoBtn.addEventListener("click", openLightbox);
+        }
+        if (watchMobile) {
+          watchMobile.addEventListener("click", openLightbox);
+        }
+        if (lightboxClose) {
+          lightboxClose.addEventListener("click", closeLightbox);
+        }
+        if (lightbox) {
+          lightbox.addEventListener("click", function (e) {
+            if (e.target === lightbox) closeLightbox();
+          });
+        }
+        document.addEventListener("keydown", function (e) {
+          if (e.key === "Escape") closeLightbox();
+        });
+
+        paint(false);
+      })();
+
+      /* How it works — Pura pattern: shared media + right accordion */
+      (function initHowTx() {
+        var root = document.getElementById("howTx");
+        if (!root) return;
+        var list = root.querySelector(".how-tx-list");
+        var items = Array.prototype.slice.call(root.querySelectorAll(".how-item"));
+        var shots = Array.prototype.slice.call(root.querySelectorAll(".how-tx-shot"));
+        var active = root.querySelector(".how-item.is-open") || items[0];
+
+        function openItem(item) {
+          var key = item.getAttribute("data-how");
+          items.forEach(function (el) {
+            var btn = el.querySelector(".how-trigger");
+            var on = el === item;
+            el.classList.toggle("is-open", on);
+            if (btn) btn.setAttribute("aria-expanded", String(on));
+          });
+          shots.forEach(function (shot) {
+            shot.classList.toggle("is-active", shot.getAttribute("data-how") === key);
+          });
+          active = item;
+        }
+
+        /*
+          Lock list height to the tallest open state.
+          Measures with transitions off + block layout so grid 0fr/1fr
+          doesn't under-report height (which caused More sales shrink).
+        */
+        function lockListHeight() {
+          if (!list) return;
+          var prev = active;
+          list.classList.add("is-measuring");
+          // Allow natural height while measuring
+          list.style.height = "auto";
+          list.style.minHeight = "0";
+          list.style.removeProperty("--how-list-min");
+          var max = 0;
+          items.forEach(function (el) {
+            openItem(el);
+            void list.offsetHeight;
+            max = Math.max(max, list.getBoundingClientRect().height);
+          });
+          var locked = Math.ceil(max) + "px";
+          list.style.setProperty("--how-list-min", locked);
+          list.style.height = "";
+          list.style.minHeight = "";
+          list.classList.remove("is-measuring");
+          if (prev) openItem(prev);
+        }
+
+        items.forEach(function (el) {
+          var btn = el.querySelector(".how-trigger");
+          if (!btn) return;
+          btn.addEventListener("click", function () {
+            openItem(el);
+          });
+        });
+
+        // Defer measure until layout/fonts settle
+        requestAnimationFrame(function () {
+          requestAnimationFrame(lockListHeight);
+        });
+        window.addEventListener("resize", lockListHeight);
+        if (document.fonts && document.fonts.ready) {
+          document.fonts.ready.then(lockListHeight);
+        }
+        window.addEventListener("load", lockListHeight);
+      })();
+
+      function setOpen(open) {
+        trigger.setAttribute("aria-expanded", String(open));
+        menu.classList.toggle("open", open);
+      }
+
+      function setNavOpen(open) {
+        if (!navToggle || !mobileNav) return;
+        navToggle.setAttribute("aria-expanded", String(open));
+        navToggle.setAttribute("aria-label", open ? "Close menu" : "Open menu");
+        mobileNav.classList.toggle("open", open);
+      }
+
+      trigger.addEventListener("click", function (e) {
+        e.stopPropagation();
+        setNavOpen(false);
+        setOpen(trigger.getAttribute("aria-expanded") !== "true");
+      });
+
+      menu.querySelectorAll("button").forEach(function (btn) {
+        btn.addEventListener("click", function (e) {
+          e.preventDefault();
+          e.stopPropagation();
+          label.textContent = btn.textContent.replace(/\s+/g, " ").trim();
+          setOpen(false);
+          var href = btn.getAttribute("data-href");
+          if (!href || href.charAt(0) !== "#") return;
+          var target = document.getElementById(href.slice(1));
+          if (!target) return;
+          var styles = getComputedStyle(document.documentElement);
+          var inset = parseFloat(styles.getPropertyValue("--page-inset")) || 16;
+          var head = parseFloat(styles.getPropertyValue("--head-h")) || 56;
+          var offset = inset + head - 28;
+          var reduce =
+            window.matchMedia &&
+            window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+          var top =
+            target.getBoundingClientRect().top + window.pageYOffset - offset;
+          window.scrollTo({
+            top: Math.max(0, top),
+            behavior: reduce ? "auto" : "smooth"
+          });
+        });
+      });
+
+      if (navToggle && mobileNav) {
+        navToggle.addEventListener("click", function (e) {
+          e.stopPropagation();
+          setOpen(false);
+          setNavOpen(navToggle.getAttribute("aria-expanded") !== "true");
+        });
+        mobileNav.querySelectorAll("a").forEach(function (link) {
+          link.addEventListener("click", function () {
+            setNavOpen(false);
+          });
+        });
+      }
+
+      /* Smooth scroll for all in-page anchors (header, hero CTAs, footer) */
+      (function initSmoothAnchors() {
+        function headerOffset() {
+          /* Match scroll-margin-top: bar over tile by ~28px (desktop + mobile) */
+          var styles = getComputedStyle(document.documentElement);
+          var inset = parseFloat(styles.getPropertyValue("--page-inset")) || 16;
+          var head = parseFloat(styles.getPropertyValue("--head-h")) || 56;
+          return inset + head - 28;
+        }
+
+        function scrollToId(id) {
+          if (!id) return false;
+          var el = document.getElementById(id);
+          if (!el) return false;
+          var reduce =
+            window.matchMedia &&
+            window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+          var top = el.getBoundingClientRect().top + window.pageYOffset - headerOffset();
+          window.scrollTo({
+            top: Math.max(0, top),
+            behavior: reduce ? "auto" : "smooth"
+          });
+          return true;
+        }
+
+        document.addEventListener("click", function (e) {
+          var a = e.target.closest && e.target.closest('a[href^="#"]');
+          if (!a) return;
+          var href = a.getAttribute("href");
+          if (!href || href === "#" || href.length < 2) return;
+          var id = href.slice(1);
+          if (!document.getElementById(id)) return;
+          e.preventDefault();
+          if (mobileNav && mobileNav.classList.contains("open")) setNavOpen(false);
+          scrollToId(id);
+          if (history.replaceState) {
+            history.replaceState(null, "", href);
+          }
+        });
+      })();
+
+      document.addEventListener("click", function (e) {
+        if (field && !field.contains(e.target)) setOpen(false);
+        if (
+          navToggle &&
+          mobileNav &&
+          !navToggle.contains(e.target) &&
+          !mobileNav.contains(e.target)
+        ) {
+          setNavOpen(false);
+        }
+      });
+
+      document.addEventListener("keydown", function (e) {
+        if (e.key === "Escape") {
+          setOpen(false);
+          setNavOpen(false);
+        }
+      });
+
+      /*
+        Desktop photo height tracks the text column so both bottoms line up
+        and hero padding below stays constant. Clamp aspect between 16:9
+        (shortest) and 4:3 (tallest). Mobile keeps CSS 4:3.
+      */
+      function syncHeroPhoto() {
+        if (!photo || !textCol) return;
+        if (!mqDesktop.matches) {
+          photo.style.height = "";
+          return;
+        }
+        var w = photo.getBoundingClientRect().width;
+        if (w < 1) return;
+        var minH = w * (9 / 16); // 16:9
+        var maxH = w * (3 / 4);  // 4:3
+        var textH = textCol.getBoundingClientRect().height;
+        var h = textH;
+        if (h < minH) h = minH;
+        if (h > maxH) h = maxH;
+        photo.style.height = Math.round(h) + "px";
+      }
+
+      var ro;
+      if (typeof ResizeObserver !== "undefined" && textCol) {
+        ro = new ResizeObserver(function () {
+          syncHeroPhoto();
+        });
+        ro.observe(textCol);
+        if (photo) ro.observe(photo);
+      }
+      window.addEventListener("resize", syncHeroPhoto);
+      if (document.fonts && document.fonts.ready) {
+        document.fonts.ready.then(syncHeroPhoto);
+      }
+      window.addEventListener("load", syncHeroPhoto);
+      syncHeroPhoto();
+      requestAnimationFrame(syncHeroPhoto);
+    })();
+  </script>
+</body>
+
+</html>
